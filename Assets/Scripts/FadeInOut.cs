@@ -6,38 +6,48 @@ using UnityEngine.UI;
 public class FadeInOut : MonoBehaviour
 {
     public static FadeInOut instance;
-    [Tooltip("검은 색되고 바로 흰색으로 변하니까 잠깐기다리는 시간")]
-    float waitTime = 0.1f;
+
+    [Tooltip("페이드 인아웃되는 시간")]
+    public float fadeTime;
+    public enum InOrOut { In, Out, Default };
+    public InOrOut inOrOut;
+    public Image background;
     private void Awake()
     {
         instance = this;
     }
-    public void FadeIn()
+    private void Update()
     {
-        StartCoroutine(FadeInCor(GameManager.instance.fadePanel, GameManager.instance.fadeTime));
-    }
-    public void FadeOut()
-    {
-        StartCoroutine(FadeOutCor(GameManager.instance.fadePanel, GameManager.instance.fadeTime));
-    }
-
-    // 밝아지기
-    public IEnumerator FadeInCor(Image fadeScreen, float fadeTime)
-    {
-        while (fadeScreen.color.a > 0)
+        switch (inOrOut)
         {
-            fadeScreen.color -= new Color(0, 0, 0, 1 / (fadeTime * 100));
+            case InOrOut.In:
+                StartCoroutine(FadeInCor(fadeTime));
+                inOrOut = InOrOut.Default;
+                break;
+            case InOrOut.Out:
+                StartCoroutine(FadeOutCor(fadeTime));
+                inOrOut = InOrOut.Default;
+                break;
+            default:
+                break;
+        }
+    }
+    // 밝아지기
+    public IEnumerator FadeInCor(float fadeTime)
+    {
+        while (background.color.a > 0)
+        {
+            background.color -= new Color(0, 0, 0, 1 / (fadeTime * 100));
             yield return new WaitForSeconds(0.01f);
         }
     }
     // 어두워지기
-    public IEnumerator FadeOutCor(Image fadeScreen, float fadeTime)
+    public IEnumerator FadeOutCor(float fadeTime)
     {
-        while (fadeScreen.color.a < 1)
+        while (background.color.a < 1)
         {
-            fadeScreen.color += new Color(0, 0, 0, 1 / (fadeTime * 102));
+            background.color += new Color(0, 0, 0, 1 / (fadeTime * 100));
             yield return new WaitForSeconds(0.01f);
         }
-        yield return new WaitForSeconds(waitTime);
     }
 }

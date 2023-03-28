@@ -8,31 +8,26 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
     public GameObject startCanvas, loadingCanvas;
-    public FadeInOut fadeInOut;
 
-    public float fadeWaitTime;
+    [Tooltip("검은 색되고 바로 흰색으로 변하니까 잠깐기다리는 시간")]
+    public float waitTime = 0.1f;
 
     private void Awake()
     {
         instance = this;
-    }
-    private void Start()
-    {
-        fadeInOut = FindObjectOfType<FadeInOut>();
     }
     public void GameStart()
     {
         if (Input.anyKeyDown)
         {
             loadingCanvas.SetActive(true);
-            fadeInOut.FadeOut();
             StartCoroutine(loading());
         }
     }
 
     IEnumerator loading()
     {
-        yield return new WaitForSeconds(GameManager.instance.fadeTime);
+        yield return new WaitForSeconds(FadeInOut.instance.fadeTime + waitTime);
         GameManager.instance.stageStart(PlayerPrefs.GetInt("SaveLevel"));
     }
 }
