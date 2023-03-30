@@ -17,11 +17,9 @@ public class Enemy : MonoBehaviour
     [Tooltip("공격 시간")]
     [SerializeField] internal float time;
     [Tooltip("도망가는 거리")]
-    [SerializeField] internal float Crossbow_Soldier_MoveXPos;
+    [SerializeField] internal float action;
     [Tooltip("화살 출발 위치")]
     [SerializeField] internal Transform arrowPos;
-    [Tooltip("화살")]
-    [SerializeField] internal GameObject arrow;
     [Tooltip("공격 하는 중인지")]
     [SerializeField] internal bool isAttack;
     [SerializeField] internal Animator anim;
@@ -45,6 +43,7 @@ public class Enemy : MonoBehaviour
                     speed = romeEnemyManager.moveSpeed[0];
                     range = romeEnemyManager.attackRange[0];
                     time = romeEnemyManager.attackTime[0];
+                    action = romeEnemyManager.particularAction[0];
                 }
                 break;
             case Mobs.창병:
@@ -52,6 +51,7 @@ public class Enemy : MonoBehaviour
                     speed = romeEnemyManager.moveSpeed[1];
                     range = romeEnemyManager.attackRange[1];
                     time = romeEnemyManager.attackTime[1];
+                    action = romeEnemyManager.particularAction[1];
                 }
                 break;
             case Mobs.방패병:
@@ -59,6 +59,7 @@ public class Enemy : MonoBehaviour
                     speed = romeEnemyManager.moveSpeed[2];
                     range = romeEnemyManager.attackRange[2];
                     time = romeEnemyManager.attackTime[2];
+                    action = romeEnemyManager.particularAction[2];
                 }
                 break;
             case Mobs.단검병:
@@ -66,6 +67,7 @@ public class Enemy : MonoBehaviour
                     speed = romeEnemyManager.moveSpeed[3];
                     range = romeEnemyManager.attackRange[3];
                     time = romeEnemyManager.attackTime[3];
+                    action = romeEnemyManager.particularAction[3];
                 }
                 break;
             case Mobs.대검병:
@@ -73,6 +75,7 @@ public class Enemy : MonoBehaviour
                     speed = romeEnemyManager.moveSpeed[4];
                     range = romeEnemyManager.attackRange[4];
                     time = romeEnemyManager.attackTime[4];
+                    action = romeEnemyManager.particularAction[4];
                 }
                 break;
         }
@@ -81,11 +84,11 @@ public class Enemy : MonoBehaviour
     {
         if (other.gameObject.CompareTag("AttackSight"))
         {
-            // 공격범위에 들어옴;
-            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
-            {
-                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
-            }
+            // // 공격범위에 들어옴;
+            // if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
+            // {
+            //     transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
+            // }
             StartCoroutine(Attack(other));
         }
     }
@@ -93,29 +96,51 @@ public class Enemy : MonoBehaviour
     {
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
-            // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
-            // if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range / range && mobs == Mobs.석궁병)
+            // // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
+            // if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range / 2 && mobs == Mobs.석궁병)
             // {
-            //     transform.position = Vector2.MoveTowards(transform.position, new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + Crossbow_Soldier_MoveXPos : transform.position.x - Crossbow_Soldier_MoveXPos, transform.position.y), speed * 2 * Time.deltaTime);
-            //     yield return new WaitForSeconds(time*이동 시간);
+            //     Debug.Log(new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y));
+            //     transform.position = Vector2.MoveTowards(transform.position, new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y), speed * 2 * Time.deltaTime);
+            //     yield return new WaitForSeconds(speed * 2);
             // }
-            // 공격
+            // // 공격
             // else
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
             {
-                Debug.Log(0);
-                //공격하고 다시 false로 바뀜
-                isAttack = true;
-                // anim.setBool("isAttack", true);
-                if (mobs == Mobs.석궁병)
+                // Debug.Log(0);
+                // //공격하고 다시 false로 바뀜
+                // isAttack = true;
+                // if (mobs == Mobs.석궁병)
+                // {
+                //     // anim.setBool("isAttack", true);
+                //     GameObject arrowClone = Instantiate(romeEnemyManager.arrow, gameObject.transform.position + ((other.transform.position.x > transform.position.x) ? Vector3.right : Vector3.left), Quaternion.identity);
+                // }
+                // else 
+                if (mobs == Mobs.방패병)
                 {
-                    GameObject arrowClone = Instantiate(arrow, gameObject.transform.position + ((other.transform.position.x > transform.position.x) ? Vector3.right : Vector3.left), Quaternion.identity);
+                    yield return new WaitForSeconds(time);
+                    // anim.setBool("isAttack", true);
+                    //돌진 코드
+                    StartCoroutine(rush(other));
                 }
-                yield return new WaitForSeconds(time);
-                // anim.setBool("isAttack", false);
+                else
+                {
+                    yield return new WaitForSeconds(time);
+                    // anim.setBool("isAttack", false);
+                }
                 yield return new WaitForSeconds(time);
                 isAttack = false;
             }
+        }
+    }
+    private IEnumerator rush(Collider2D other)
+    {
+        Vector2 arrivePos = new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y);
+        while (Mathf.Abs(transform.position.x) <= Mathf.Abs(arrivePos.x))
+        {
+            transform.position = Vector2.MoveTowards(transform.position, arrivePos, speed * 2 * Time.deltaTime);
+            Debug.Log(((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y));
+            yield return new WaitForSeconds(0.01f);
         }
     }
 }

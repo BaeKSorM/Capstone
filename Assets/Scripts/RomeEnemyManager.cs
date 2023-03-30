@@ -10,4 +10,6 @@ public class RomeEnemyManager : MonoBehaviour
     [SerializeField] internal List<int> attackRange;
     [Tooltip("enum에 따른 공격 시간")]
     [SerializeField] internal List<float> attackTime;
+    [SerializeField] internal List<float> particularAction;
+    [SerializeField] internal GameObject arrow;
 }

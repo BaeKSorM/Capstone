@@ -153,14 +153,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed:
-  - 7
+  - 5
+  - 5
+  - 5
+  - 5
+  - 5
+  attackRange: 0700000003000000030000000300000003000000
+  attackTime:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  particularAction:
+  - 5
   - 5
   - 10
-  attackRange: 070000000700000007000000
-  attackTime:
-  - 0.1
-  - 1
-  - 1
+  - 5
+  - 5
+  arrow: {fileID: 4976069816894549654, guid: 5ab08641c8df4ba48a5eb6fc69a53b30, type: 3}
 --- !u!4 &25504421
 Transform:
   m_ObjectHideFlags: 0
@@ -313,7 +324,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 30, y: 20}
+  m_Size: {x: 40, y: 20}
   m_EdgeRadius: 0
 --- !u!212 &229521483
 SpriteRenderer:
@@ -1629,7 +1640,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -1643,7 +1654,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961742529}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -1735,13 +1746,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21d1e57af2999543818e16d65a9a4cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mobs: 0
+  mobs: 2
   speed: 0
   range: 0
   time: 0
-  Crossbow_Soldier_MoveXPos: 0
+  action: 0
   arrowPos: {fileID: 0}
-  arrow: {fileID: 4976069816894549654, guid: 5ab08641c8df4ba48a5eb6fc69a53b30, type: 3}
   isAttack: 0
   anim: {fileID: 0}
 --- !u!1 &1058116156
