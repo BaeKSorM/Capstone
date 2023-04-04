@@ -16,13 +16,14 @@ public class Enemy : MonoBehaviour
 
     [Tooltip("공격 시간")]
     [SerializeField] internal float time;
-    [Tooltip("도망가는 거리")]
+    [Tooltip("특정 행동 거리")]
     [SerializeField] internal float action;
     [Tooltip("화살 출발 위치")]
     [SerializeField] internal Transform arrowPos;
     [Tooltip("공격 하는 중인지")]
     [SerializeField] internal bool isAttack;
     [SerializeField] internal Animator anim;
+    public bool holding;
     RomeEnemyManager romeEnemyManager;
     #endregion
 
@@ -84,11 +85,11 @@ public class Enemy : MonoBehaviour
     {
         if (other.gameObject.CompareTag("AttackSight"))
         {
-            // // 공격범위에 들어옴;
-            // if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
-            // {
-            //     transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
-            // }
+            // 공격범위에 들어옴;
+            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
+            }
             StartCoroutine(Attack(other));
         }
     }
@@ -96,51 +97,52 @@ public class Enemy : MonoBehaviour
     {
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
-            // // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
-            // if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range / 2 && mobs == Mobs.석궁병)
-            // {
-            //     Debug.Log(new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y));
-            //     transform.position = Vector2.MoveTowards(transform.position, new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y), speed * 2 * Time.deltaTime);
-            //     yield return new WaitForSeconds(speed * 2);
-            // }
-            // // 공격
-            // else
+            // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
+            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range / 2 && mobs == Mobs.석궁병)
+            {
+                Debug.Log(new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y));
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y), speed * 2 * Time.deltaTime);
+                yield return new WaitForSeconds(speed * 2);
+            }
+            // 공격
+            else
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
             {
-                // Debug.Log(0);
-                // //공격하고 다시 false로 바뀜
-                // isAttack = true;
-                // if (mobs == Mobs.석궁병)
-                // {
-                //     // anim.setBool("isAttack", true);
-                //     GameObject arrowClone = Instantiate(romeEnemyManager.arrow, gameObject.transform.position + ((other.transform.position.x > transform.position.x) ? Vector3.right : Vector3.left), Quaternion.identity);
-                // }
-                // else 
+                Debug.Log(0);
+                //공격하고 다시 false로 바뀜
+                isAttack = true;
+                if (mobs == Mobs.석궁병)
+                {
+                    // anim.setBool("isAttack", true);
+                    GameObject arrowClone = Instantiate(romeEnemyManager.arrow, gameObject.transform.position + ((other.transform.position.x > transform.position.x) ? Vector3.right : Vector3.left), Quaternion.identity);
+                    yield return new WaitForSeconds(time);
+                }
+                else
                 if (mobs == Mobs.방패병)
                 {
-                    yield return new WaitForSeconds(time);
-                    // anim.setBool("isAttack", true);
-                    //돌진 코드
-                    StartCoroutine(rush(other));
+                    if (!holding)
+                    {
+                        holding = true;
+                        yield return new WaitForSeconds(time);
+                        // 플레이어쪽으로 돌진할 방향
+                        Vector2 pl = new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y);
+                        while (transform.position.x != pl.x)
+                        {
+                            transform.position = Vector2.MoveTowards(transform.position, pl, 0.1f);
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                        holding = false;
+                        yield return new WaitForSeconds(time);
+                    }
                 }
                 else
                 {
                     yield return new WaitForSeconds(time);
                     // anim.setBool("isAttack", false);
+                    yield return new WaitForSeconds(time);
                 }
-                yield return new WaitForSeconds(time);
                 isAttack = false;
             }
-        }
-    }
-    private IEnumerator rush(Collider2D other)
-    {
-        Vector2 arrivePos = new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y);
-        while (Mathf.Abs(transform.position.x) <= Mathf.Abs(arrivePos.x))
-        {
-            transform.position = Vector2.MoveTowards(transform.position, arrivePos, speed * 2 * Time.deltaTime);
-            Debug.Log(((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y));
-            yield return new WaitForSeconds(0.01f);
         }
     }
 }

@@ -8,13 +8,14 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     [Header("스테이지")]
     [Tooltip("스테이지 이름")]
-    public List<string> stages;
+    [SerializeField] internal List<string> stages;
     [Tooltip("현재 스테이지")]
-    public int saveStageLevel;
+    [SerializeField] internal int saveStageLevel;
     private void Awake()
     {
         instance = this;
         PlayerPrefs.SetInt("SaveLevel", 0);
+        DontDestroyOnLoad(this);
     }
     public void stageStart(int _stageLevel)
     {
