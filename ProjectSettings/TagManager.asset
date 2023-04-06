@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - AttackSight
   - Enemy
+  - EnemyAttack
   layers:
   - Default
   - TransparentFX

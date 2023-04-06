@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
+    [Tooltip("체력 바")]
+    [SerializeField] internal Slider hpbar;
     [Tooltip("이동 속도")]
     [SerializeField] private float moveSpeed = 1.0f;
     [Tooltip("점프 힘")]
@@ -15,23 +17,35 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool isJumped;
     [Tooltip("점프 횟수")]
     [SerializeField] private int jumpCount;
+    [SerializeField] private bool isCinematic = true;
     Rigidbody2D playerRB;
     void Awake()
     {
         instance = this;
     }
-    private void Start()
+    private IEnumerator Start()
     {
         playerRB = GetComponent<Rigidbody2D>();
+        if (isCinematic)
+        {
+            // FadeInOut fadeInOut = GameObject.Find("FadeIn Canvas").GetComponent<FadeInOut>();
+            yield return new WaitForSeconds(1);
+            isCinematic = false;
+        }
     }
     private void Update()
     {
-        Jump();
-
+        if (!isCinematic)
+        {
+            Jump();
+        }
     }
     void FixedUpdate()
     {
-        Move();
+        if (!isCinematic)
+        {
+            Move();
+        }
     }
     private void Move()
     {
@@ -68,5 +82,23 @@ public class PlayerController : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.CompareTag("EnemyAttack"))
+        {
+            if (other.name.Contains("Arrow"))
+            {
+                hpbar.value -= other.GetComponent<Weapons>().arrowDamage;
+            }
+            else if (other.transform.parent.name.Contains("Shield"))
+            {
+                if (other.GetComponentInParent<ShieldEnemy>().holding)
+                {
+                    hpbar.value -= other.GetComponentInParent<ShieldEnemy>().attackDamage;
+                }
+            }
+            else
+            {
+                hpbar.value -= other.GetComponentInParent<RestEnemy>().attackDamage;
+            }
+        }
     }
 }

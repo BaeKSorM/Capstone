@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ShieldEnemy : MonoBehaviour
 {
+    public static ShieldEnemy Instance;
     [Tooltip("이동속도")]
     [SerializeField] internal float speed = 5.0f;
     [Tooltip("공격 거리")]
@@ -13,10 +14,19 @@ public class ShieldEnemy : MonoBehaviour
     [SerializeField] internal float time = 1.0f;
     [Tooltip("특정 행동 거리")]
     [SerializeField] internal float action = 5.0f;
+    [Tooltip("공격 데미지")]
+    [SerializeField] internal float attackDamage = 2.5f;
     [Tooltip("공격 하는 중인지")]
     [SerializeField] internal bool isAttack;
     [Tooltip("돌진 대기중")]
     public bool holding;
+
+    [SerializeField] internal Animator anim;
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+        Instance = this;
+    }
     void OnTriggerStay2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("AttackSight"))
@@ -41,12 +51,12 @@ public class ShieldEnemy : MonoBehaviour
                 isAttack = true;
                 if (!holding)
                 {
-                    holding = true;
                     yield return new WaitForSeconds(time);
                     // 플레이어쪽으로 돌진할 방향
                     Vector2 pl = new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y);
                     while (transform.position.x != pl.x)
                     {
+                        holding = true;
                         transform.position = Vector2.MoveTowards(transform.position, pl, 0.1f);
                         yield return new WaitForSeconds(0.01f);
                     }
