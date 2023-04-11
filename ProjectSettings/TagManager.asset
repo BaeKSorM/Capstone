@@ -9,6 +9,7 @@ TagManager:
   - AttackSight
   - Enemy
   - EnemyAttack
+  - Weapon
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - UI
   - 
   - Player
-  - 
+  - Enemy
   - 
   - 
   - 

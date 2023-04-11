@@ -12,21 +12,23 @@ public class RestEnemy : MonoBehaviour
 
     [Tooltip("공격 시간")]
     [SerializeField] internal float time = 1.0f;
+    [Tooltip("공격 대기 시간")]
+    [SerializeField] internal float delayTime = 1.0f;
     [Tooltip("특정 행동 거리")]
     [SerializeField] internal float action = 5.0f;
 
     [Tooltip("공격 데미지")]
     [SerializeField] internal float attackDamage = 2.5f;
-    [SerializeField] internal float damage;
     [Tooltip("공격 하는 중인지")]
     [SerializeField] internal bool isAttack;
+    [SerializeField] internal GameObject weapon;
     [SerializeField] internal Animator anim;
 
     void Start()
     {
         anim = GetComponent<Animator>();
+        weapon = transform.GetChild(1).gameObject;
         Instance = this;
-        damage = attackDamage;
     }
     void OnTriggerStay2D(Collider2D other)
     {
@@ -46,26 +48,16 @@ public class RestEnemy : MonoBehaviour
         {
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
             {
-                Debug.Log(0);
                 //공격하고 다시 false로 바뀜
                 isAttack = true;
+                weapon.SetActive(true);
                 anim.SetBool("isAttack", true);
                 yield return new WaitForSeconds(time);
                 anim.SetBool("isAttack", false);
-                yield return new WaitForSeconds(time);
+                weapon.SetActive(false);
+                yield return new WaitForSeconds(delayTime);
                 isAttack = false;
             }
-        }
-    }
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            attackDamage = damage;
-        }
-        else
-        {
-            attackDamage = 0;
         }
     }
 }

@@ -17,7 +17,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool isJumped;
     [Tooltip("점프 횟수")]
     [SerializeField] private int jumpCount;
+    [Tooltip("무기")]
+    [SerializeField] internal string[] weaponNames;
+    [SerializeField] internal string weaponAnimName;
+    [Tooltip("무기별 공격 시간")]
+    [SerializeField] internal List<float> time;
     [SerializeField] private bool isCinematic = true;
+    internal Animator anim;
     Rigidbody2D playerRB;
     void Awake()
     {
@@ -26,6 +32,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator Start()
     {
         playerRB = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         if (isCinematic)
         {
             // FadeInOut fadeInOut = GameObject.Find("FadeIn Canvas").GetComponent<FadeInOut>();
@@ -38,7 +45,38 @@ public class PlayerController : MonoBehaviour
         if (!isCinematic)
         {
             Jump();
+            if (Input.GetButtonDown("Fire1"))
+            {
+                StartCoroutine(Attack());
+            }
+            if (Input.GetKeyDown(KeyCode.S) && weaponNames[1] != "")
+            {
+                weaponNames[2] = weaponNames[0];
+                weaponNames[0] = weaponNames[1];
+                weaponNames[1] = weaponNames[2];
+                weaponAnimName = "use" + weaponNames[1];
+                anim.SetBool(weaponAnimName, false);
+                weaponAnimName = "use" + weaponNames[0];
+                anim.SetBool(weaponAnimName, true);
+            }
         }
+        ExplosionDamage(transform.position, 5f);
+    }
+    void ExplosionDamage(Vector3 center, float radius)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
+        int i = 0;
+        while (i < hitColliders.Length)
+        {
+            hitColliders[i].SendMessage("AddDamage");
+            i++;
+        }
+    }
+    IEnumerator Attack()
+    {
+        anim.SetBool("isAttack", true);
+        yield return new WaitForSeconds(time[0]);
+        anim.SetBool("isAttack", false);
     }
     void FixedUpdate()
     {
@@ -80,13 +118,38 @@ public class PlayerController : MonoBehaviour
             jumpCount = 0;
         }
     }
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Weapon"))
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                // 무기 얻기 , 이름에 넣지 않기 -> Clone(), 오브젝트 풀링으로 해결 가능
+                if (weaponNames[1] == "")
+                {
+                    if (weaponNames[0] == "")
+                    {
+
+                    }
+                    else if (weaponNames[1] == "")
+                    {
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+        }
+    }
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("EnemyAttack"))
         {
             if (other.name.Contains("Arrow"))
             {
-                hpbar.value -= other.GetComponent<Weapons>().arrowDamage;
+                hpbar.value -= other.GetComponent<Arrow>().arrowDamage;
             }
             else if (other.transform.parent.name.Contains("Shield"))
             {
@@ -97,7 +160,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                hpbar.value -= other.GetComponentInParent<RestEnemy>().attackDamage;
+                hpbar.value -= other.GetComponent<EnemyWeapons>().attackDamage;
             }
         }
     }

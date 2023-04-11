@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapons : MonoBehaviour
+public class Arrow : MonoBehaviour
 {
     [SerializeField] private int rotateSpeed;
     [SerializeField] private GameObject target;

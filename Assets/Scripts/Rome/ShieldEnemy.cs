@@ -12,6 +12,8 @@ public class ShieldEnemy : MonoBehaviour
 
     [Tooltip("공격 시간")]
     [SerializeField] internal float time = 1.0f;
+    [Tooltip("공격 대기 시간")]
+    [SerializeField] internal float delayTime = 1.0f;
     [Tooltip("특정 행동 거리")]
     [SerializeField] internal float action = 5.0f;
     [Tooltip("공격 데미지")]
@@ -20,11 +22,13 @@ public class ShieldEnemy : MonoBehaviour
     [SerializeField] internal bool isAttack;
     [Tooltip("돌진 대기중")]
     public bool holding;
+    Rigidbody2D rb;
 
     [SerializeField] internal Animator anim;
     void Start()
     {
         anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
         Instance = this;
     }
     void OnTriggerStay2D(Collider2D other)
@@ -53,15 +57,12 @@ public class ShieldEnemy : MonoBehaviour
                 {
                     yield return new WaitForSeconds(time);
                     // 플레이어쪽으로 돌진할 방향
-                    Vector2 pl = new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x - action : transform.position.x + action, transform.position.y);
-                    while (transform.position.x != pl.x)
-                    {
-                        holding = true;
-                        transform.position = Vector2.MoveTowards(transform.position, pl, 0.1f);
-                        yield return new WaitForSeconds(0.01f);
-                    }
+                    float pl = (transform.position.x > other.transform.position.x) ? -action : action;
+                    //addforce 사용해서 돌진
+                    holding = true;
+                    rb.AddForce(Vector2.right * pl * speed);
+                    yield return new WaitForSeconds(delayTime);
                     holding = false;
-                    yield return new WaitForSeconds(time);
                 }
                 isAttack = false;
             }
