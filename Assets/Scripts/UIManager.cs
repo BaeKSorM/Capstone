@@ -25,7 +25,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    IEnumerator loading()
+    public IEnumerator loading()
     {
         yield return new WaitForSeconds(FadeInOut.instance.fadeTime + waitTime);
         GameManager.instance.stageStart(PlayerPrefs.GetInt("SaveLevel"));

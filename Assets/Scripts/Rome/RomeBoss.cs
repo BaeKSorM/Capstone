@@ -9,6 +9,14 @@ public class RomeBoss : MonoBehaviour
     public eSkills skills;
     [Tooltip("체력 바")]
     [SerializeField] internal Slider hpbar;
+    [SerializeField] internal Animator anim;
+    [SerializeField] internal GameObject[] summonEnemies;
+    [SerializeField] internal Vector2[] summonPosLR;
+    [SerializeField] internal float curHp;
+    [SerializeField] internal float exhaustionHp;
+    [SerializeField] internal Transform player;
+
+
     void Start()
     {
         StartCoroutine(Boss());
@@ -17,46 +25,63 @@ public class RomeBoss : MonoBehaviour
     {
         while (hpbar.value > 0)
         {
+            anim.SetBool("isAttack", true);
             yield return new WaitForSeconds(0);
             switch (Random.Range(0, 4))
             {
                 case 0:
-                    SpawnHorses();
+                    StartCoroutine(SpawnMobs());
+                    Debug.Log(0);
                     break;
                 case 1:
-                    Spear_Poking();
+                    StartCoroutine(Spear_Poking());
+                    Debug.Log(1);
                     break;
                 case 2:
-                    Leaping_Attack();
+                    StartCoroutine(Healing());
+                    Debug.Log(2);
                     break;
                 case 3:
-                    Defending();
+                    StartCoroutine(Crushing());
+                    Debug.Log(3);
                     break;
-                    // case 4:
-                    // break;
             }
-            // 말은 하단이나 상단 전체
-            // 창찌르기는 보스 앞 거리 일부 강한 공격
-            // 도약 찍기는 도약후 떨어질위치는 특정 시간 플레이어위 떨어질 자리 표시
-            // 막기는 몇초간의 막기 막을때마다 소리
+            yield return new WaitForSeconds(1.0f);
         }
+    }
+
+    IEnumerator SpawnMobs()
+    {
+        anim.SetBool("spawnMobs", true);
+        yield return new WaitForSeconds(0.2f);
+        for (int i = 0; i < 5; ++i)
+        {
+            Instantiate(summonEnemies[Random.Range(0, 3)], summonPosLR[Random.Range(0, 2)], Quaternion.identity);
+        }
+        yield return new WaitForSeconds(1.0f);
+        anim.SetBool("spawnMobs", false);
+    }
+    IEnumerator Spear_Poking()
+    {
+        anim.SetBool("poking", true);
+        yield return new WaitForSeconds(1.0f);
+        anim.SetBool("poking", false);
+    }
+    IEnumerator Healing()
+    {
+        exhaustionHp = hpbar.value - 10;
+        anim.SetBool("heal", true);
+        while (hpbar.value > exhaustionHp) { }
+        anim.SetBool("heal", false);
+        anim.SetBool("lostHeal", true);
+        yield return new WaitForSeconds(1.0f);
+        anim.SetBool("lostHeal", false);
+
+    }
+    IEnumerator Crushing()
+    {
+        transform.localScale = transform.position.x > player.position.x ? new Vector2(1, 1) : new Vector2(-1, 1);
+        anim.SetBool("crush", true);
         yield return null;
-    }
-
-    void SpawnHorses()
-    {
-
-    }
-    void Spear_Poking()
-    {
-
-    }
-    void Leaping_Attack()
-    {
-
-    }
-    void Defending()
-    {
-
     }
 }

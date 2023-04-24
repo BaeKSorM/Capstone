@@ -1,49 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DropWeapons : MonoBehaviour
 {
-    string weaponAnimName;
-    void OnTriggerStay2D(Collider2D other)
+    public static DropWeapons instance;
+
+    [Tooltip("드랍할것인가?")]
+    [SerializeField] internal bool isDrop;
+    [Tooltip("떨어뜨릴 무기")]
+    [SerializeField] internal GameObject dropWeapon;
+    [Tooltip("떨어뜨린 무기")]
+    [SerializeField] internal GameObject dropedWeapon;
+    [Tooltip("떨어뜨린 무기들 담을 곳")]
+    [SerializeField] internal GameObject dropedWeapons;
+    [SerializeField] internal int num;
+    [SerializeField] internal Slider hpbar;
+    void Start()
     {
-        if (other.gameObject.tag == "Player")
+
+    }
+    void Update()
+    {
+        if (hpbar.value <= 0)
         {
-            if (Input.GetKeyDown(KeyCode.F))
+            if (isDrop)
             {
-                if (PlayerController.instance.weaponNames[1] == "")
-                {
-                    if (PlayerController.instance.weaponNames[0] == "")
-                    {
-                        PlayerController.instance.weaponNames[0] = gameObject.name;
-                        weaponAnimName = "use" + PlayerController.instance.weaponNames[0];
-                        PlayerController.instance.anim.SetBool(weaponAnimName, true);
-                        Debug.Log(weaponAnimName);
-                    }
-                    else if (PlayerController.instance.weaponNames[1] == "")
-                    {
-                        PlayerController.instance.weaponNames[1] = PlayerController.instance.weaponNames[0];
-                        weaponAnimName = "use" + PlayerController.instance.weaponNames[1];
-                        Debug.Log(weaponAnimName);
-                        PlayerController.instance.anim.SetBool(weaponAnimName, false);
-                        PlayerController.instance.weaponNames[0] = gameObject.name;
-                        weaponAnimName = "use" + PlayerController.instance.weaponNames[0];
-                        Debug.Log(weaponAnimName);
-                        PlayerController.instance.anim.SetBool(weaponAnimName, true);
-                    }
-                }
-                else
-                {
-                    weaponAnimName = "use" + PlayerController.instance.weaponNames[0];
-                    Debug.Log(weaponAnimName);
-                    PlayerController.instance.anim.SetBool(weaponAnimName, false);
-                    PlayerController.instance.weaponNames[0] = gameObject.name;
-                    weaponAnimName = "use" + PlayerController.instance.weaponNames[0];
-                    Debug.Log(weaponAnimName);
-                    PlayerController.instance.anim.SetBool(weaponAnimName, true);
-                }
-                Destroy(gameObject);
+                dropedWeapon = Instantiate(dropWeapon, transform.position, Quaternion.identity);
+                dropedWeapon.GetComponent<DropedWeapons>().num = GameManager.instance.dropedDeadCount++;
+                dropedWeapon.transform.SetParent(dropedWeapons.transform);
             }
+            ++GameManager.instance.deadCount;
+            Destroy(gameObject);
         }
     }
+
 }

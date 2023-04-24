@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RestEnemy : MonoBehaviour
 {
@@ -23,12 +24,22 @@ public class RestEnemy : MonoBehaviour
     [SerializeField] internal bool isAttack;
     [SerializeField] internal GameObject weapon;
     [SerializeField] internal Animator anim;
+    [SerializeField] internal Slider hpbar;
+    [SerializeField] internal Transform enemyHpBar;
 
     void Start()
     {
         anim = GetComponent<Animator>();
         weapon = transform.GetChild(1).gameObject;
         Instance = this;
+        enemyHpBar = transform.GetChild(0).GetChild(0);
+    }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerWeapon"))
+        {
+            hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
+        }
     }
     void OnTriggerStay2D(Collider2D other)
     {
@@ -41,6 +52,14 @@ public class RestEnemy : MonoBehaviour
             }
             StartCoroutine(Attack(other));
         }
+    }
+    void Update()
+    {
+        EnemyHp(enemyHpBar);
+    }
+    void EnemyHp(Transform _enemyHpBar)
+    {
+        _enemyHpBar.position = new Vector2(transform.position.x, transform.position.y + transform.localScale.y / 2 + 0.5f);
     }
     IEnumerator Attack(Collider2D other)
     {

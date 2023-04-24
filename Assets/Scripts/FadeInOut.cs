@@ -8,15 +8,16 @@ public class FadeInOut : MonoBehaviour
     public static FadeInOut instance;
 
     [Tooltip("페이드 인아웃되는 시간")]
-    public float fadeTime;
-    public enum InOrOut { In, Out, Default };
-    public InOrOut inOrOut;
-    public Image background;
+    [SerializeField] internal float fadeTime;
+    [SerializeField] internal enum InOrOut { In, Out, Default };
+    [SerializeField] internal InOrOut inOrOut;
+    [SerializeField] internal Image background;
+    float ff;
     private void Awake()
     {
         instance = this;
     }
-    private void Update()
+    void Update()
     {
         switch (inOrOut)
         {
@@ -38,8 +39,12 @@ public class FadeInOut : MonoBehaviour
         while (background.color.a > 0)
         {
             background.color -= new Color(0, 0, 0, 1 / (fadeTime * 100));
+            ff += Time.deltaTime;
             yield return new WaitForSeconds(0.01f);
+            ff += 0.01f;
         }
+        // 인 시간
+        // Debug.Log(ff);
     }
     // 어두워지기
     public IEnumerator FadeOutCor(float fadeTime)

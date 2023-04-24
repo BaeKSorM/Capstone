@@ -9,6 +9,8 @@ public class Arrow : MonoBehaviour
     [SerializeField] internal float arrowDamage, damage;
     [Tooltip("왼쪽을 바라보면 0")]
     float lookLeftRange;
+    [Tooltip("화살 사라지는 시간")]
+    [SerializeField] internal float arrowDestroyTime = 1.0f;
     Vector3 targetPos;
     void Awake()
     {
@@ -29,6 +31,7 @@ public class Arrow : MonoBehaviour
     {
         while (true)
         {
+            Destroy(gameObject, arrowDestroyTime);
             transform.position = Vector2.MoveTowards(transform.position, targetPos + transform.position, 0.1f);
             yield return new WaitForSeconds(0.01f);
         }
@@ -37,7 +40,9 @@ public class Arrow : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            Debug.Log(other.name);
             arrowDamage = damage;
+            Destroy(gameObject);
         }
         else
         {

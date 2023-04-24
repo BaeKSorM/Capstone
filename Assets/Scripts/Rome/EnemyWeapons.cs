@@ -10,19 +10,6 @@ public class EnemyWeapons : MonoBehaviour
     void Start()
     {
         restEnemy = transform.parent.GetComponent<RestEnemy>();
-        damage = restEnemy.attackDamage;
-    }
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            attackDamage = damage;
-            Debug.Log(1);
-        }
-        else
-        {
-            attackDamage = 0;
-        }
-        //yield return new WaitForSeconds(restEnemy.time);
+        attackDamage = restEnemy.attackDamage;
     }
 }

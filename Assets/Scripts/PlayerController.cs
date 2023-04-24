@@ -19,24 +19,37 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int jumpCount;
     [Tooltip("무기")]
     [SerializeField] internal string[] weaponNames;
+    [SerializeField] internal GameObject[] getWeapons;
     [SerializeField] internal string weaponAnimName;
     [Tooltip("무기별 공격 시간")]
-    [SerializeField] internal List<float> time;
+    [SerializeField] internal float time;
     [SerializeField] private bool isCinematic = true;
     internal Animator anim;
     Rigidbody2D playerRB;
+    [SerializeField] internal int weaponCount;
+    [SerializeField] internal bool isTouching;
+    [SerializeField] internal bool isTeleporting;
+    [SerializeField] internal bool defend;
+    [SerializeField] internal float reduceDamage;
+    [SerializeField] internal GameObject fadeCan;
+    [SerializeField] internal Camera mainCam;
+
+    FadeInOut fadeInOut;
+    CameraManager cameraManager;
     void Awake()
     {
         instance = this;
     }
     private IEnumerator Start()
     {
+        time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         playerRB = GetComponent<Rigidbody2D>();
+        fadeInOut = fadeCan.GetComponent<FadeInOut>();
+        cameraManager = mainCam.GetComponent<CameraManager>();
         anim = GetComponent<Animator>();
         if (isCinematic)
         {
-            // FadeInOut fadeInOut = GameObject.Find("FadeIn Canvas").GetComponent<FadeInOut>();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(fadeInOut.fadeTime);
             isCinematic = false;
         }
     }
@@ -45,51 +58,130 @@ public class PlayerController : MonoBehaviour
         if (!isCinematic)
         {
             Jump();
-            if (Input.GetButtonDown("Fire1"))
+            if (!anim.GetBool("isAttack") && !isTeleporting)
             {
-                StartCoroutine(Attack());
-            }
-            if (Input.GetKeyDown(KeyCode.S) && weaponNames[1] != "")
-            {
-                weaponNames[2] = weaponNames[0];
-                weaponNames[0] = weaponNames[1];
-                weaponNames[1] = weaponNames[2];
-                weaponAnimName = "use" + weaponNames[1];
-                anim.SetBool(weaponAnimName, false);
-                weaponAnimName = "use" + weaponNames[0];
-                anim.SetBool(weaponAnimName, true);
+                if (playerRB.velocity.x > 0.04f)
+                {
+                    transform.localScale = new Vector2(1, 1);
+                }
+                if (playerRB.velocity.x < -0.04f)
+                {
+                    transform.localScale = new Vector2(-1, 1);
+                }
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    StartCoroutine(Attack());
+                }
+                if (Input.GetKeyDown(KeyCode.S) && weaponNames[1] != "")
+                {
+                    swapWeapons();
+                }
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    Debug.Log(GameManager.instance.enemies.Count);
+                    if (ReadyForBoss.instance.ready && GameManager.instance.deadCount == GameManager.instance.enemies.Count)
+                    {
+                        StartCoroutine(BossStageOn());
+                    }
+                    //f 눌러 줍기 함수
+                    else if (isTouching)
+                    {
+                        getWeapon();
+                    }
+                }
             }
         }
-        ExplosionDamage(transform.position, 5f);
     }
-    void ExplosionDamage(Vector3 center, float radius)
+    void FixedUpdate()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
-        int i = 0;
-        while (i < hitColliders.Length)
+        if (!isCinematic && !anim.GetBool("isAttack") && !isTeleporting)
         {
-            hitColliders[i].SendMessage("AddDamage");
-            i++;
+            Move();
         }
     }
     IEnumerator Attack()
     {
         anim.SetBool("isAttack", true);
-        yield return new WaitForSeconds(time[0]);
+        if (weaponNames[0] != "Shield")
+        {
+            transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
+        }
+        transform.Find(weaponNames[0]).gameObject.SetActive(true);
+        yield return new WaitForSeconds(time);
+        transform.Find(weaponNames[0]).gameObject.SetActive(false);
+        reduceDamage = 0;
+        transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = 0;
         anim.SetBool("isAttack", false);
     }
-    void FixedUpdate()
+    IEnumerator BossStageOn()
     {
-        if (!isCinematic)
-        {
-            Move();
-        }
+        //fadeinout하고 보스스테이지위치로
+        fadeInOut.inOrOut = FadeInOut.InOrOut.Out;
+        yield return new WaitForSeconds(fadeInOut.fadeTime * 2);
+        // -1을 보스 바닥 y 위치로 바꾸기
+        gameObject.transform.position = new Vector2(cameraManager.bossGroundCenter.x, -1);
+        GameManager.instance.bossAppear = true;
+        yield return new WaitForSeconds(0.1f);
+        fadeInOut.inOrOut = FadeInOut.InOrOut.In;
     }
     private void Move()
     {
         playerRB.velocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed, playerRB.velocity.y);
     }
-
+    private void swapWeapons()
+    {
+        getWeapons[2] = getWeapons[0];
+        weaponNames[2] = weaponNames[0];
+        getWeapons[0] = getWeapons[1];
+        weaponNames[0] = weaponNames[1];
+        weaponNames[1] = weaponNames[2];
+        getWeapons[1] = getWeapons[2];
+        weaponAnimName = "use" + weaponNames[1];
+        anim.SetBool(weaponAnimName, false);
+        weaponAnimName = "use" + weaponNames[0];
+        anim.SetBool(weaponAnimName, true);
+    }
+    private void getWeapon()
+    {
+        // if (weaponNames[0] == "")
+        // {
+        //     weaponNames[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).name.Replace("(Clone)", "");
+        //     weaponAnimName = "use" + weaponNames[0];
+        //     anim.SetBool(weaponAnimName, true);
+        //     getWeapons[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).gameObject;
+        //     getWeapons[0].SetActive(false);
+        // }
+        // else 
+        if (weaponNames[1] == "")
+        {
+            Debug.Log(0);
+            GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).gameObject.SetActive(false);
+            weaponNames[2] = weaponNames[0];
+            getWeapons[2] = getWeapons[0];
+            weaponNames[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).name.Replace("(Clone)", "");
+            getWeapons[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).gameObject;
+            weaponNames[1] = weaponNames[2];
+            getWeapons[1] = getWeapons[2];
+            weaponAnimName = "use" + weaponNames[1];
+            anim.SetBool(weaponAnimName, false);
+            weaponAnimName = "use" + weaponNames[0];
+            anim.SetBool(weaponAnimName, true);
+        }
+        else
+        {
+            Debug.Log(1);
+            getWeapons[0].transform.position = transform.position;
+            getWeapons[0].SetActive(true);
+            getWeapons[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).gameObject;
+            getWeapons[0].SetActive(false);
+            weaponAnimName = "use" + weaponNames[0];
+            anim.SetBool(weaponAnimName, false);
+            weaponNames[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).name.Replace("(Clone)", "");
+            weaponAnimName = "use" + weaponNames[0];
+            anim.SetBool(weaponAnimName, true);
+        }
+        time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
+    }
     private void Jump()
     {
         if (Input.GetButtonDown("Jump") && jumpCount < 2)
@@ -118,50 +210,33 @@ public class PlayerController : MonoBehaviour
             jumpCount = 0;
         }
     }
-    void OnTriggerStay2D(Collider2D other)
-    {
-        if (other.gameObject.CompareTag("Weapon"))
-        {
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                // 무기 얻기 , 이름에 넣지 않기 -> Clone(), 오브젝트 풀링으로 해결 가능
-                if (weaponNames[1] == "")
-                {
-                    if (weaponNames[0] == "")
-                    {
-
-                    }
-                    else if (weaponNames[1] == "")
-                    {
-
-                    }
-                }
-                else
-                {
-
-                }
-            }
-        }
-    }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("EnemyAttack"))
+        if (other.CompareTag("EnemyWeapon"))
         {
-            if (other.name.Contains("Arrow"))
+            Damaged(other);
+        }
+    }
+    void Damaged(Collider2D other)
+    {
+        if (other.name.Contains("Arrow"))
+        {
+            float aDamage = other.GetComponent<Arrow>().arrowDamage;
+            hpbar.value -= (aDamage - reduceDamage) > 0 ? (aDamage - reduceDamage) : 0;
+        }
+        else if (other.name.Contains("shield"))
+        {
+            if (other.GetComponentInParent<ShieldEnemy>().holding)
             {
-                hpbar.value -= other.GetComponent<Arrow>().arrowDamage;
+                float sDamage = other.GetComponentInParent<ShieldEnemy>().attackDamage;
+                hpbar.value -= (sDamage - reduceDamage) > 0 ? (sDamage - reduceDamage) : 0;
             }
-            else if (other.transform.parent.name.Contains("Shield"))
-            {
-                if (other.GetComponentInParent<ShieldEnemy>().holding)
-                {
-                    hpbar.value -= other.GetComponentInParent<ShieldEnemy>().attackDamage;
-                }
-            }
-            else
-            {
-                hpbar.value -= other.GetComponent<EnemyWeapons>().attackDamage;
-            }
+        }
+        else
+        {
+            float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
+            hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
+            // Debug.Log(other.GetComponentInParent<RestEnemy>().attackDamage);
         }
     }
 }

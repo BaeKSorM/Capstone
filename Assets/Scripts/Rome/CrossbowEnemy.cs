@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class CrossbowEnemy : MonoBehaviour
@@ -23,17 +24,29 @@ public class CrossbowEnemy : MonoBehaviour
     [Tooltip("공격 하는 중인지")]
     [SerializeField] internal bool isAttack;
     [SerializeField] internal bool isAvoid;
-    [SerializeField] internal bool a;
+    [SerializeField] internal bool avoiding;
     [SerializeField] internal GameObject arrow;
     [SerializeField] internal Animator anim;
+    [SerializeField] internal Slider hpbar;
+    [SerializeField] internal Transform enemyHpBar;
+
+
     Rigidbody2D rb;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         Instance = this;
+        enemyHpBar = transform.GetChild(0).GetChild(0);
     }
-
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerWeapon"))
+        {
+            Debug.Log(other.GetComponent<PlayerWeapons>().damage);
+            hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
+        }
+    }
     void OnTriggerStay2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("AttackSight"))
@@ -46,24 +59,32 @@ public class CrossbowEnemy : MonoBehaviour
             StartCoroutine(Attack(other));
         }
     }
+    void Update()
+    {
+        EnemyHp(enemyHpBar);
+    }
+    void EnemyHp(Transform _enemyHpBar)
+    {
+        _enemyHpBar.position = new Vector2(transform.position.x, transform.position.y + transform.localScale.y / 2 + 0.5f);
+    }
     IEnumerator Attack(Collider2D other)
     {
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
             // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
-            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoid && !a)
+            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoid && !avoiding)
             {
-                a = true;
+                avoiding = true;
                 // Debug.Log(new Vector2((transform.position.x > other.transform.position.x) ? transform.position.x + action : transform.position.x - action, transform.position.y));
                 float pl = (transform.position.x > other.transform.position.x) ? action : -action;
                 StartCoroutine(Avoidance(new Vector2(transform.position.x + pl, transform.position.y)));
                 //rb.AddForce(new Vector2(pl, 0), ForceMode2D.Impulse);
                 yield return new WaitForSeconds(delayTime);
-                Debug.Log(pl);
+                // Debug.Log(pl);
                 // Debug.Log(isAvoid);
             }
             // 공격
-            else if (!a)
+            else if (!avoiding)
             {
                 //공격하고 다시 false로 바뀜
                 GameObject arrowClone = Instantiate(arrow, gameObject.transform.position + ((other.transform.position.x > transform.position.x) ? Vector3.right : Vector3.left), Quaternion.identity);
@@ -82,15 +103,13 @@ public class CrossbowEnemy : MonoBehaviour
     }
     IEnumerator Avoidance(Vector2 arrivePos)
     {
-        Debug.Log("Avoidance");
-        Debug.Log(arrivePos);
         // arrivePos에 도착할때까지 이동
         while (Mathf.Abs(transform.position.x - arrivePos.x) > 0.1f)
         {
             transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.01f);
             yield return new WaitForSeconds(0.001f);
         }
-        a = false;
+        avoiding = false;
         isAvoid = true;
     }
 }
