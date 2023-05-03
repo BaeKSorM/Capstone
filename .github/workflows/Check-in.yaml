@@ -1,0 +1,18 @@
+name: Check-in
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check-in:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check-in
+      run: |
+        date=$(date '+%Y-%m-%d')
+        echo "출석체크: $date" >> README.md
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git commit -am "출석체크: $date"
+        git push
