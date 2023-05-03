@@ -2,14 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerWeapons : MonoBehaviour
+public class PlayerShield : PlayerWeapons
 {
-    [Tooltip("데미지")]
-    [SerializeField] internal int damage;
-    [Tooltip("공격 시간")]
-    [SerializeField] internal float time;
-    [SerializeField] internal float saveDamage;
-
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("EnemyWeapon") && PlayerController.instance.weaponNames[0] == "Shield")

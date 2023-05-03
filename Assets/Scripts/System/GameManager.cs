@@ -26,23 +26,25 @@ public class GameManager : MonoBehaviour
     [Tooltip("죽은 적 수")]
     [SerializeField] internal int deadCount;
 
+    [SerializeField] internal enum eAge { 로마, 현대, 미래 };
+    [SerializeField] internal eAge age;
+
 
     [Tooltip("보스 등장했는지")]
     [SerializeField] internal bool bossAppear;
     private void Awake()
     {
         instance = this;
-        PlayerPrefs.SetInt("SaveLevel", 0);
+        // PlayerPrefs.SetInt("SaveLevel", 0);
     }
     void Start()
     {
-        // isTouching = new List<bool>(new bool[enemies.Count]);
         for (int i = 0; i < dropEnemiesMaxCount; ++i)
         {
             int rand = Random.Range(0, enemies.Count);
-            if (!enemies[rand].transform.GetComponent<DropWeapons>().isDrop)
+            if (!enemies[rand].transform.GetComponentInChildren<DropWeapons>().isDrop)
             {
-                enemies[rand].transform.GetComponent<DropWeapons>().isDrop = true;
+                enemies[rand].transform.GetComponentInChildren<DropWeapons>().isDrop = true;
             }
             else
             {

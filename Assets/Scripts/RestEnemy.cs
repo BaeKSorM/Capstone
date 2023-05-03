@@ -3,36 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RestEnemy : MonoBehaviour
+public class RestEnemy : Creature
 {
     public static RestEnemy Instance;
-    [Tooltip("이동속도")]
-    [SerializeField] internal float speed = 5.0f;
-    [Tooltip("공격 거리")]
-    [SerializeField] internal float range = 2.0f;
-
-    [Tooltip("공격 시간")]
-    [SerializeField] internal float time = 1.0f;
-    [Tooltip("공격 대기 시간")]
-    [SerializeField] internal float delayTime = 1.0f;
-    [Tooltip("특정 행동 거리")]
-    [SerializeField] internal float action = 5.0f;
-
-    [Tooltip("공격 데미지")]
-    [SerializeField] internal float attackDamage = 2.5f;
-    [Tooltip("공격 하는 중인지")]
-    [SerializeField] internal bool isAttack;
     [SerializeField] internal GameObject weapon;
-    [SerializeField] internal Animator anim;
-    [SerializeField] internal Slider hpbar;
     [SerializeField] internal Transform enemyHpBar;
+    Canvas canvas;
 
     void Start()
     {
+        speed = 5.0f;
+        range = 2.0f;
+        time = 1.0f;
+        delayTime = 1.0f;
+        action = 5.0f;
+        attackDamage = 2.5f;
         anim = GetComponent<Animator>();
+        enemyHpBar = transform.parent.GetChild(0).GetChild(0);
+        canvas = transform.parent.GetChild(0).GetComponent<Canvas>();
         weapon = transform.GetChild(1).gameObject;
         Instance = this;
-        enemyHpBar = transform.GetChild(0).GetChild(0);
+        canvas.worldCamera = Camera.main;
     }
     void OnTriggerEnter2D(Collider2D other)
     {

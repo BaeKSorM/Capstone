@@ -23,25 +23,29 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal string weaponAnimName;
     [Tooltip("무기별 공격 시간")]
     [SerializeField] internal float time;
-    [SerializeField] private bool isCinematic = true;
+    [SerializeField] internal bool isCinematic = true;
+    [SerializeField] internal bool bossCanMove;
     internal Animator anim;
     Rigidbody2D playerRB;
     [SerializeField] internal int weaponCount;
     [SerializeField] internal bool isTouching;
-    [SerializeField] internal bool isTeleporting;
-    [SerializeField] internal bool defend;
     [SerializeField] internal float reduceDamage;
     [SerializeField] internal GameObject fadeCan;
+    [SerializeField] internal GameObject rome;
     [SerializeField] internal Camera mainCam;
+    [SerializeField] internal Vector3 bossReadyPos;
+
 
     FadeInOut fadeInOut;
     CameraManager cameraManager;
+    RomeBoss romeBoss;
     void Awake()
     {
         instance = this;
     }
     private IEnumerator Start()
     {
+        romeBoss = rome.GetComponent<RomeBoss>();
         time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         playerRB = GetComponent<Rigidbody2D>();
         fadeInOut = fadeCan.GetComponent<FadeInOut>();
@@ -58,7 +62,7 @@ public class PlayerController : MonoBehaviour
         if (!isCinematic)
         {
             Jump();
-            if (!anim.GetBool("isAttack") && !isTeleporting)
+            if (!anim.GetBool("isAttack"))
             {
                 if (playerRB.velocity.x > 0.04f)
                 {
@@ -78,7 +82,6 @@ public class PlayerController : MonoBehaviour
                 }
                 if (Input.GetKeyDown(KeyCode.F))
                 {
-                    Debug.Log(GameManager.instance.enemies.Count);
                     if (ReadyForBoss.instance.ready && GameManager.instance.deadCount == GameManager.instance.enemies.Count)
                     {
                         StartCoroutine(BossStageOn());
@@ -94,7 +97,7 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (!isCinematic && !anim.GetBool("isAttack") && !isTeleporting)
+        if (!isCinematic && !anim.GetBool("isAttack"))
         {
             Move();
         }
@@ -116,13 +119,24 @@ public class PlayerController : MonoBehaviour
     IEnumerator BossStageOn()
     {
         //fadeinout하고 보스스테이지위치로
+        isCinematic = true;
         fadeInOut.inOrOut = FadeInOut.InOrOut.Out;
         yield return new WaitForSeconds(fadeInOut.fadeTime * 2);
         // -1을 보스 바닥 y 위치로 바꾸기
-        gameObject.transform.position = new Vector2(cameraManager.bossGroundCenter.x, -1);
+        transform.localScale = new Vector3(1, 1);
+        transform.position = new Vector2(cameraManager.bossGroundCenter.x, cameraManager.bossGroundCenter.y);
         GameManager.instance.bossAppear = true;
-        yield return new WaitForSeconds(0.1f);
         fadeInOut.inOrOut = FadeInOut.InOrOut.In;
+        // 도망 이동 시키기
+        yield return new WaitForSeconds(1.0f);
+        while (transform.position != bossReadyPos)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, bossReadyPos, 0.01f);
+            yield return null;
+        }
+        bossCanMove = true;
+        //fightReady 끝나는 시간
+        isCinematic = false;
     }
     private void Move()
     {
@@ -143,6 +157,7 @@ public class PlayerController : MonoBehaviour
     }
     private void getWeapon()
     {
+        // 무기 없이 시작할때 추가 및 보수 필요
         // if (weaponNames[0] == "")
         // {
         //     weaponNames[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).name.Replace("(Clone)", "");
@@ -154,7 +169,6 @@ public class PlayerController : MonoBehaviour
         // else 
         if (weaponNames[1] == "")
         {
-            Debug.Log(0);
             GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).gameObject.SetActive(false);
             weaponNames[2] = weaponNames[0];
             getWeapons[2] = getWeapons[0];
@@ -169,7 +183,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Debug.Log(1);
             getWeapons[0].transform.position = transform.position;
             getWeapons[0].SetActive(true);
             getWeapons[0] = GameManager.instance.enemiesDropedWeapons.GetChild(weaponCount).gameObject;
@@ -219,24 +232,31 @@ public class PlayerController : MonoBehaviour
     }
     void Damaged(Collider2D other)
     {
-        if (other.name.Contains("Arrow"))
+        if (GameManager.instance.age == GameManager.eAge.로마)
         {
-            float aDamage = other.GetComponent<Arrow>().arrowDamage;
-            hpbar.value -= (aDamage - reduceDamage) > 0 ? (aDamage - reduceDamage) : 0;
-        }
-        else if (other.name.Contains("shield"))
-        {
-            if (other.GetComponentInParent<ShieldEnemy>().holding)
+            if (other.name.Contains("Arrow"))
             {
-                float sDamage = other.GetComponentInParent<ShieldEnemy>().attackDamage;
-                hpbar.value -= (sDamage - reduceDamage) > 0 ? (sDamage - reduceDamage) : 0;
+                float aDamage = other.GetComponent<EnemyArrow>().arrowDamage;
+                hpbar.value -= (aDamage - reduceDamage) > 0 ? (aDamage - reduceDamage) : 0;
             }
-        }
-        else
-        {
-            float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
-            hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
-            // Debug.Log(other.GetComponentInParent<RestEnemy>().attackDamage);
+            else if (other.name.Contains("shield"))
+            {
+                if (other.GetComponentInParent<ShieldEnemy>().holding)
+                {
+                    float sDamage = other.GetComponentInParent<ShieldEnemy>().attackDamage;
+                    hpbar.value -= (sDamage - reduceDamage) > 0 ? (sDamage - reduceDamage) : 0;
+                }
+            }
+            else if (other.name.Contains("Boss"))
+            {
+                float bDamage = other.GetComponentInParent<RomeBoss>().attackDamage;
+                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
+            }
+            else
+            {
+                float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
+                hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
+            }
         }
     }
 }

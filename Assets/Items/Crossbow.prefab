@@ -223,6 +223,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   num: 0
+  typeOfWeapon: 1
+  mindamage: 0
+  maxdamage: 0
 --- !u!58 &-2146459310971555834
 CircleCollider2D:
   m_ObjectHideFlags: 0

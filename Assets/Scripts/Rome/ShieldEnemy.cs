@@ -3,41 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ShieldEnemy : MonoBehaviour
+public class ShieldEnemy : Creature
 {
     public static ShieldEnemy Instance;
-    [Tooltip("이동속도")]
-    [SerializeField] internal float speed = 5.0f;
-    [Tooltip("공격 거리")]
-    [SerializeField] internal float range = 3.0f;
-
-    [Tooltip("공격 시간")]
-    [SerializeField] internal float time = 1.0f;
-    [Tooltip("공격 대기 시간")]
-    [SerializeField] internal float delayTime = 1.0f;
-    [Tooltip("특정 행동 거리")]
-    [SerializeField] internal float action = 5.0f;
-    [Tooltip("공격 데미지")]
-    [SerializeField] internal float attackDamage = 2.5f;
-    [Tooltip("공격 하는 중인지")]
-    [SerializeField] internal bool isAttack;
     [SerializeField] internal GameObject weapon;
     [Tooltip("돌진 대기중")]
     [SerializeField] internal bool holding;
-    [SerializeField] internal Slider hpbar;
     [Tooltip("막는 중인지")]
     [SerializeField] internal bool isDefending;
     [Tooltip("막는 중일때 방패에 닿였는지")]
     [SerializeField] internal bool defend;
     [SerializeField] internal Transform enemyHpBar;
     Rigidbody2D rb;
-
-    [SerializeField] internal Animator anim;
+    Canvas canvas;
     void Start()
     {
+        speed = 5.0f;
+        range = 3.0f;
+        time = 1.0f;
+        delayTime = 1.0f;
+        action = 5.0f;
+        attackDamage = 2.5f;
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-        enemyHpBar = transform.GetChild(0).GetChild(0);
+        enemyHpBar = transform.parent.GetChild(0).GetChild(0);
+        canvas = transform.parent.GetChild(0).GetComponent<Canvas>();
+        canvas.worldCamera = Camera.main;
         Instance = this;
     }
     void OnTriggerEnter2D(Collider2D other)

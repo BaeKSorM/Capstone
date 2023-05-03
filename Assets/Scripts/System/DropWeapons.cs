@@ -32,7 +32,7 @@ public class DropWeapons : MonoBehaviour
                 dropedWeapon.transform.SetParent(dropedWeapons.transform);
             }
             ++GameManager.instance.deadCount;
-            Destroy(gameObject);
+            Destroy(gameObject.transform.parent.gameObject);
         }
     }
 

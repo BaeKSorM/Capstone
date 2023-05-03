@@ -6,16 +6,28 @@ public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance;
     [SerializeField] Transform player;
+    [SerializeField] Vector3 bossDoorFornt;
     Vector3 targetPos;
+    Vector3 ss;
     [Tooltip("보스 스테이지 중앙 중앙")]
     [SerializeField] internal Vector3 bossGroundCenter;
 
-    void Update()
+    private void Update()
     {
-
-    }
-    private void FixedUpdate()
-    {
+        if (player.position.x >= bossDoorFornt.x && !GameManager.instance.bossAppear)
+        {
+            if (player.position.y <= 0)
+            {
+                targetPos = new Vector3(bossDoorFornt.x, this.transform.position.y - Mathf.Abs(transform.position.y), this.transform.position.z);
+                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+            }
+            else
+            {
+                targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
+                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+            }
+        }
+        else
         if (!GameManager.instance.bossAppear)
         {
             if (player.position.y <= 0)
@@ -43,7 +55,7 @@ public class CameraManager : MonoBehaviour
                 transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
             }
         }
-        else
+        else if (GameManager.instance.bossAppear)
         {
             targetPos = bossGroundCenter;
             transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
