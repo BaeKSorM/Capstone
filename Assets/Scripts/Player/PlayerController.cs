@@ -84,6 +84,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (ReadyForBoss.instance.ready && GameManager.instance.deadCount == GameManager.instance.enemies.Count)
                     {
+                        playerRB.velocity = Vector2.zero;
                         StartCoroutine(BossStageOn());
                     }
                     //f 눌러 줍기 함수
@@ -124,6 +125,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(fadeInOut.fadeTime * 2);
         // -1을 보스 바닥 y 위치로 바꾸기
         transform.localScale = new Vector3(1, 1);
+        transform.GetChild(1).localScale = new Vector2(40, 20);
         transform.position = new Vector2(cameraManager.bossGroundCenter.x, cameraManager.bossGroundCenter.y);
         GameManager.instance.bossAppear = true;
         fadeInOut.inOrOut = FadeInOut.InOrOut.In;
@@ -217,8 +219,9 @@ public class PlayerController : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Ground"))
+        if (other.gameObject.CompareTag("MidGround") || other.gameObject.CompareTag("BottomGround"))
         {
+            cameraManager.camPos = transform.position.y + 2.2f;
             isJumped = false;
             jumpCount = 0;
         }

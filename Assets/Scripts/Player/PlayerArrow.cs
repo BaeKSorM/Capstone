@@ -18,5 +18,11 @@ public class PlayerArrow : PlayerWeapons
     {
         Destroy(gameObject, PlayerCrossbow.instance.destroyTime);
     }
-
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Wall") || other.CompareTag("MidGround") || other.CompareTag("BottomGround") || other.CompareTag("Enemy"))
+        {
+            Destroy(gameObject);
+        }
+    }
 }

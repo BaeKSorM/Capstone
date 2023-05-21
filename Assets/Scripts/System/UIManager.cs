@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
+
     public static UIManager instance;
     public GameObject startCanvas, loadingCanvas;
 

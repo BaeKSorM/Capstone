@@ -8,54 +8,96 @@ public class CameraManager : MonoBehaviour
     [SerializeField] Transform player;
     [SerializeField] Vector3 bossDoorFornt;
     Vector3 targetPos;
-    Vector3 ss;
     [Tooltip("보스 스테이지 중앙 중앙")]
     [SerializeField] internal Vector3 bossGroundCenter;
-
-    private void Update()
+    [SerializeField] internal enum eGround { under, mid };
+    [SerializeField] internal eGround ground;
+    [SerializeField] internal float camPos;
+    void Start()
     {
-        if (player.position.x >= bossDoorFornt.x && !GameManager.instance.bossAppear)
+        // camPos =;
+        Debug.Log(camPos);
+    }
+    private void FixedUpdate()
+    {
+        if (player.position.x >= bossDoorFornt.x && player.position.y > bossDoorFornt.y && player.position.y < bossDoorFornt.y + 3 && !GameManager.instance.bossAppear)
         {
             if (player.position.y <= 0)
             {
-                targetPos = new Vector3(bossDoorFornt.x, this.transform.position.y - Mathf.Abs(transform.position.y), this.transform.position.z);
-                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+                targetPos = new Vector3(bossDoorFornt.x, 0, this.transform.position.z);
             }
             else
             {
                 targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
-                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
             }
+            transform.position = Vector3.Lerp(transform.position, targetPos, 0.1f);
         }
         else
         if (!GameManager.instance.bossAppear)
         {
-            if (player.position.y <= 0)
+            if (ground == eGround.under)
             {
-                if (player.position.x > 0)
+                //화면 중간보다 위일때
+                if (player.position.y - 1.0f > camPos)
                 {
-                    targetPos = new Vector3(player.position.x, this.transform.position.y - Mathf.Abs(transform.position.y), this.transform.position.z);
+
+                    if (player.position.x >= bossDoorFornt.x)
+                    {
+                        targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
+                    }
+                    else if (player.position.x > 0)
+                    {
+                        targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
+                    }
+                    else
+                    {
+                        targetPos = new Vector3(0, player.position.y, this.transform.position.z);
+                    }
+                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
                 }
+                //떨어질때
+                else
+                if (player.position.y < camPos - 2.8)
+                {
+                    if (player.position.x >= bossDoorFornt.x)
+                    {
+                        targetPos = new Vector3(bossDoorFornt.x, player.position.y + 2.2f, this.transform.position.z);
+                    }
+                    else if (player.position.x > 0)
+                    {
+                        targetPos = new Vector3(player.position.x, player.position.y + 2.2f, this.transform.position.z);
+                    }
+                    else
+                    {
+                        targetPos = new Vector3(0, player.position.y + 2.2f, this.transform.position.z);
+                    }
+                    transform.position = targetPos;
+                }
+                //아닐때
                 else
                 {
-                    targetPos = new Vector3(0, this.transform.position.y - Mathf.Abs(transform.position.y), this.transform.position.z);
+                    if (player.position.x >= bossDoorFornt.x)
+                    {
+                        targetPos = new Vector3(bossDoorFornt.x, camPos, this.transform.position.z);
+                    }
+                    else if (player.position.x > 0)
+                    {
+                        targetPos = new Vector3(player.position.x, camPos, this.transform.position.z);
+                    }
+                    else
+                    {
+                        targetPos = new Vector3(0, camPos, this.transform.position.z);
+                    }
+                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
                 }
-                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
             }
-            else
+            else if (ground == eGround.mid)
             {
-                if (player.position.x > 0)
-                {
-                    targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
-                }
-                else
-                {
-                    targetPos = new Vector3(0, player.position.y, this.transform.position.z);
-                }
-                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+
             }
         }
-        else if (GameManager.instance.bossAppear)
+        else
+        if (GameManager.instance.bossAppear)
         {
             targetPos = bossGroundCenter;
             transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);

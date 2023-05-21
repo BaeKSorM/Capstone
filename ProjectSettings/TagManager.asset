@@ -5,12 +5,14 @@ TagManager:
   serializedVersion: 2
   tags:
   - Wall
-  - Ground
   - AttackSight
   - Enemy
   - Weapon
   - PlayerWeapon
   - EnemyWeapon
+  - BottomGround
+  - MidGround
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -28,7 +30,7 @@ TagManager:
   - GetItem
   - Shield
   - Wall
-  - 
+  - Ground
   - 
   - 
   - 

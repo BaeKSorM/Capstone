@@ -12,7 +12,7 @@ public class RomeBoss : MonoBehaviour
     [SerializeField] internal Slider hpbar;
     [SerializeField] internal Animator anim;
     [SerializeField] internal GameObject[] summonEnemies;
-    [SerializeField] internal Vector3[] summonPosLR;
+    [SerializeField] internal Vector3 summonPos;
     [SerializeField] internal float exhaustionHp;
     [SerializeField] internal Transform player;
 
@@ -23,8 +23,6 @@ public class RomeBoss : MonoBehaviour
 
     [Tooltip("공격 시간")]
     [SerializeField] internal float time = 1.0f;
-    [Tooltip("공격 대기 시간")]
-    [SerializeField] internal float pokingDelayTime = 1.0f;
 
     [Tooltip("공격 데미지")]
     [SerializeField] internal float attackDamage = 2.5f;
@@ -37,7 +35,11 @@ public class RomeBoss : MonoBehaviour
     [SerializeField] internal GameObject weapon;
     [SerializeField] internal GameObject spawnedMobs;
     [SerializeField] internal bool enterance;
-    [SerializeField] internal bool enemyEnter;
+    [SerializeField] internal bool isSpawning;
+    [SerializeField] internal int summonEnemiesCount = 5;
+    [SerializeField] internal int maxSpawnMobsCount = 5;
+    [SerializeField] Vector3 bossAppear = new Vector2(23, -1.99f);
+    [SerializeField] internal CameraManager cameraManager;
     Rigidbody2D bossRB;
     void Start()
     {
@@ -67,15 +69,20 @@ public class RomeBoss : MonoBehaviour
         {
             if (!PlayerController.instance.isCinematic)
             {
+                int LR = transform.position.x > player.position.x ? 1 : -1;
                 skillEnd = false;
-                switch (Random.Range(1, 2))
+                // 확률도 조정해야함
+                switch (Random.Range(0, 4))
                 {
                     case 0:
-                        StartCoroutine(SpawnMobs());
+                        if (spawnedMobs.transform.childCount < maxSpawnMobsCount)
+                        {
+                            StartCoroutine(SpawnMobs());
+                        }
                         Debug.Log(0);
                         break;
                     case 1:
-                        StartCoroutine(SpearPoking());
+                        StartCoroutine(SpearPoking(LR));
                         Debug.Log(1);
                         break;
                     case 2:
@@ -83,24 +90,26 @@ public class RomeBoss : MonoBehaviour
                         {
                             StartCoroutine(Healing());
                         }
-                        skillEnd = true;
+                        else
+                        {
+                            skillEnd = true;
+                        }
                         Debug.Log(2);
                         break;
                     case 3:
-                        StartCoroutine(Crushing());
+                        StartCoroutine(Crushing(LR));
                         Debug.Log(3);
                         break;
                 }
                 yield return new WaitUntil(() => skillEnd);
-                yield return new WaitForSeconds(1.0f);
             }
             yield return null;
         }
     }
     internal IEnumerator BossAppear()
     {
+        Physics2D.IgnoreLayerCollision(15, 8, true);
         yield return new WaitForSeconds(0.2f);
-        Vector3 bossAppear = new Vector2(23, -1.99f);
         while (transform.position != bossAppear)
         {
             transform.position = Vector2.MoveTowards(transform.position, bossAppear, 0.05f);
@@ -111,37 +120,39 @@ public class RomeBoss : MonoBehaviour
     IEnumerator SpawnMobs()
     {
         anim.SetBool("isSpawning", true);
+        isSpawning = true;
         yield return new WaitForSeconds(0.2f);
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < summonEnemiesCount; ++i)
         {
-            int LR = Random.Range(0, 2);
-            int enemy = Random.Range(0, 2);
-            GameObject spawnedMob = Instantiate(summonEnemies[enemy], summonPosLR[LR], Quaternion.identity);
-
-            StartCoroutine(SpawnMobMove(spawnedMob, LR));
+            int enemy = Random.Range(0, summonEnemies.Length);
+            GameObject spawnedMob = Instantiate(summonEnemies[enemy], summonPos, Quaternion.identity);
+            StartCoroutine(SpawnMobMove(spawnedMob));
             spawnedMob.transform.parent = spawnedMobs.transform;
+            yield return new WaitForSeconds(0.5f);
+            Debug.Log(i);
         }
+
+        //소환하고 그다음 진행안됨
+    }
+    IEnumerator SpawnMobMove(GameObject notInGameMob)
+    {
+        while (notInGameMob.transform.position != new Vector3(cameraManager.bossGroundCenter.x, notInGameMob.transform.position.y))
+        {
+            // Debug.Log("mobmove");
+            notInGameMob.transform.position = Vector2.MoveTowards(notInGameMob.transform.position, cameraManager.bossGroundCenter, 0.01f);
+            // yield return new WaitForSeconds(0.5f);
+            yield return null;
+        }
+        yield return new WaitForSeconds(1.0f);
+        Debug.Log("end");
         yield return new WaitForSeconds(1.0f);
         anim.SetBool("isSpawning", false);
-    }
-    IEnumerator SpawnMobMove(GameObject notInGameMob, int LR)
-    {
-        enemyEnter = true;
-        float cur = 0;
-        float enterTime = 1f;
-        while (cur < enterTime)
-        {
-            cur += Time.deltaTime;
-            // Debug.Log("mobmove");
-            notInGameMob.transform.position = Vector2.MoveTowards(notInGameMob.transform.position, summonPosLR[LR] + ((LR == 1) ? -new Vector3(10, 0) : new Vector3(10, 0)), 0.01f);
-            yield return new WaitForSeconds(0.001f);
-        }
-        yield return new WaitForSeconds(1.0f);
+        isSpawning = false;
         skillEnd = true;
-        enemyEnter = false;
     }
-    IEnumerator SpearPoking()
+    IEnumerator SpearPoking(int LR)
     {
+        transform.localScale = new Vector2(LR, 1);
         while (Mathf.Abs(transform.position.x - player.position.x) > range)
         {
             transform.position = Vector2.MoveTowards(transform.position, new Vector2(player.position.x, transform.position.y), speed * Time.deltaTime);
@@ -154,9 +165,9 @@ public class RomeBoss : MonoBehaviour
         yield return new WaitForSeconds(time);
         anim.SetBool("isAttack", false);
         weapon.SetActive(false);
-        yield return new WaitForSeconds(pokingDelayTime);
-        isAttack = false;
+        yield return new WaitForSeconds(1.0f);
         skillEnd = true;
+        isAttack = false;
     }
     IEnumerator Healing()
     {
@@ -168,19 +179,40 @@ public class RomeBoss : MonoBehaviour
             curTime += healDelayTime;
             hpbar.value += healAmountPerSecond;
             yield return new WaitForSeconds(healDelayTime);
-            if (curTime > healingTime || hpbar.value < exhaustionHp)
+            if (curTime > healingTime || hpbar.value < exhaustionHp || hpbar.value >= 100)
             {
+                anim.SetBool("isHealing", false);
+                yield return new WaitForSeconds(1.0f);
                 break;
             }
         }
-        anim.SetBool("isHealing", false);
-        yield return new WaitForSeconds(1.0f);
         skillEnd = true;
     }
-    IEnumerator Crushing()
+    IEnumerator Crushing(int LR)
     {
-        transform.localScale = transform.position.x > player.position.x ? new Vector2(1, 1) : new Vector2(-1, 1);
-        anim.SetBool("crush", true);
-        yield return null;
+        Vector3 curPos = transform.position;
+        Vector3 arrivePos = new Vector2(cameraManager.bossGroundCenter.x - LR * 10, transform.position.y);
+        // Debug.Log(curPos);
+        transform.localScale = new Vector2(LR, 1);
+
+        anim.SetBool("isCrushing", true);
+        weapon.SetActive(true);
+        do
+        {
+            transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.01f);
+            // 왼쪽으로 이동할때 왼쪽벽 위치보다 왼쪽으로 가면 오른쪽으로 이동
+            // 왼쪽으로 가려면 -1 오른쪽에 있으면 1
+            if (cameraManager.bossGroundCenter.x + -LR * 10 == transform.position.x)
+            {
+                //수정
+                transform.position = new Vector2(cameraManager.bossGroundCenter.x + LR * 10, transform.position.y);
+                arrivePos = curPos;
+            }
+            yield return null;
+        } while (transform.position.x != curPos.x);
+        weapon.SetActive(false);
+        yield return new WaitForSeconds(1.0f);
+        anim.SetBool("isCrushing", false);
+        skillEnd = true;
     }
 }

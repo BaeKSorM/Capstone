@@ -34,7 +34,6 @@ public class EnemyArrow : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log(other.name);
             arrowDamage = damage;
             Destroy(gameObject);
         }

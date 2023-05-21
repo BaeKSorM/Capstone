@@ -21,7 +21,7 @@ public class RestEnemy : Creature
         anim = GetComponent<Animator>();
         enemyHpBar = transform.parent.GetChild(0).GetChild(0);
         canvas = transform.parent.GetChild(0).GetComponent<Canvas>();
-        weapon = transform.GetChild(1).gameObject;
+        weapon = transform.GetChild(0).gameObject;
         Instance = this;
         canvas.worldCamera = Camera.main;
     }
