@@ -41,5 +41,9 @@ public class EnemyArrow : MonoBehaviour
         {
             arrowDamage = 0;
         }
+        if (other.CompareTag("BottomGround") || other.CompareTag("MidGround"))
+        {
+            Destroy(gameObject);
+        }
     }
 }

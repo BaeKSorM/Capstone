@@ -18,9 +18,9 @@ public class ShieldEnemy : Creature
     Canvas canvas;
     void Start()
     {
-        speed = 5.0f;
+        // speed = 5.0f;
         range = 3.0f;
-        time = 1.0f;
+        // time = 1.0f;
         delayTime = 1.0f;
         action = 5.0f;
         attackDamage = 2.5f;
@@ -35,13 +35,14 @@ public class ShieldEnemy : Creature
     {
         if (other.CompareTag("PlayerWeapon"))
         {
+            // Debug.Log(other.transform.parent.name);
             if (transform.localScale.x != other.transform.parent.localScale.x)
             {
-                defend = false;
+                defend = true;
             }
             else
             {
-                defend = true;
+                defend = false;
             }
             if (!isDefending)
             {
@@ -94,16 +95,16 @@ public class ShieldEnemy : Creature
                 if (!holding)
                 {
                     isDefending = true;
+                    holding = true;
                     yield return new WaitForSeconds(time);
                     // 플레이어쪽으로 돌진할 방향
                     float pl = (transform.position.x > other.transform.position.x) ? -action : action;
                     // 돌진 대기
-                    holding = true;
                     // 막는 중 아님
                     isDefending = false;
                     //addforce 사용해서 돌진
-                    rb.AddForce(Vector2.right * pl * speed);
-                    yield return new WaitForSeconds(0.2f);
+                    rb.AddForce(Vector2.right * pl * speed, ForceMode2D.Impulse);
+                    yield return new WaitForSeconds(2f);
                     weapon.SetActive(true);
                     holding = false;
                     yield return new WaitForSeconds(delayTime);

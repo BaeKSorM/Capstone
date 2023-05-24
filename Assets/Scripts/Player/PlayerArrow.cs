@@ -22,6 +22,7 @@ public class PlayerArrow : PlayerWeapons
     {
         if (other.CompareTag("Wall") || other.CompareTag("MidGround") || other.CompareTag("BottomGround") || other.CompareTag("Enemy"))
         {
+            gameObject.SetActive(false);
             Destroy(gameObject);
         }
     }

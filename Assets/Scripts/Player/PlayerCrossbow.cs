@@ -19,5 +19,6 @@ public class PlayerCrossbow : PlayerWeapons
     {
         arrowClone = Instantiate(arrow, transform.position, Quaternion.Euler(new Vector3(0, 0, fireAngle * transform.parent.localScale.x)));
         arrowClone.GetComponent<Rigidbody2D>().velocity = arrowClone.transform.right * firePower * transform.parent.localScale.x;
+        arrowClone.transform.parent = gameObject.transform.parent;
     }
 }

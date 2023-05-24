@@ -16,7 +16,7 @@ public class CameraManager : MonoBehaviour
     void Start()
     {
         // camPos =;
-        Debug.Log(camPos);
+        // Debug.Log(camPos);
     }
     private void FixedUpdate()
     {

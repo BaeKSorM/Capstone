@@ -11,12 +11,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 1.0f;
     [Tooltip("점프 힘")]
     [SerializeField] private float jumpForce = 1.0f;
-    [Tooltip("감속된 점프 힘")]
-    [SerializeField] private float deceleratedJumpForce = 1.0f;
+    // [Tooltip("감속된 점프 힘")]
+    // [SerializeField] private float deceleratedJumpForce = 1.0f;
     [Tooltip("더블 점프 체크")]
     [SerializeField] private bool isJumped;
     [Tooltip("점프 횟수")]
     [SerializeField] private int jumpCount;
+    [Tooltip("최대 점프 횟수")]
+    [SerializeField] private int maxJumpCount;
     [Tooltip("무기")]
     [SerializeField] internal string[] weaponNames;
     [SerializeField] internal GameObject[] getWeapons;
@@ -34,8 +36,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal GameObject rome;
     [SerializeField] internal Camera mainCam;
     [SerializeField] internal Vector3 bossReadyPos;
-
-
+    [SerializeField] private LayerMask mask;
+    [SerializeField] private float dis;
     FadeInOut fadeInOut;
     CameraManager cameraManager;
     RomeBoss romeBoss;
@@ -105,14 +107,15 @@ public class PlayerController : MonoBehaviour
     }
     IEnumerator Attack()
     {
+        playerRB.velocity = Vector2.zero;
         anim.SetBool("isAttack", true);
         if (weaponNames[0] != "Shield")
         {
             transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
         }
-        transform.Find(weaponNames[0]).gameObject.SetActive(true);
+        // transform.Find(weaponNames[0]).gameObject.SetActive(true);
         yield return new WaitForSeconds(time);
-        transform.Find(weaponNames[0]).gameObject.SetActive(false);
+        // transform.Find(weaponNames[0]).gameObject.SetActive(false);
         reduceDamage = 0;
         transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = 0;
         anim.SetBool("isAttack", false);
@@ -133,7 +136,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         while (transform.position != bossReadyPos)
         {
-            transform.position = Vector2.MoveTowards(transform.position, bossReadyPos, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, bossReadyPos, 0.1f);
             yield return null;
         }
         bossCanMove = true;
@@ -142,7 +145,15 @@ public class PlayerController : MonoBehaviour
     }
     private void Move()
     {
-        playerRB.velocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed, playerRB.velocity.y);
+        playerRB.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, playerRB.velocity.y);
+        if (playerRB.velocity.x != 0)
+        {
+            anim.SetBool("isMove", true);
+        }
+        else
+        {
+            anim.SetBool("isMove", false);
+        }
     }
     private void swapWeapons()
     {
@@ -199,8 +210,10 @@ public class PlayerController : MonoBehaviour
     }
     private void Jump()
     {
-        if (Input.GetButtonDown("Jump") && jumpCount < 2)
+        if (Input.GetButtonDown("Jump") && jumpCount < maxJumpCount)
         {
+            ++jumpCount;
+            anim.SetBool("isJump", true);
             if (!isJumped)
             {
                 //playerRB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
@@ -209,21 +222,35 @@ public class PlayerController : MonoBehaviour
                 //두번 빨리 누르면 낮게 점프하고 천천히 누르면 높게 점프한다 like skul
                 isJumped = true;
             }
-            else
-            {
-                //playerRB.AddForce(Vector2.up * deceleratedJumpForce, ForceMode2D.Impulse);
-                playerRB.velocity = Vector2.up * deceleratedJumpForce;
-            }
-            ++jumpCount;
+            // else
+            // {
+            //     //playerRB.AddForce(Vector2.up * deceleratedJumpForce, ForceMode2D.Impulse);
+            //     playerRB.velocity = Vector2.up * deceleratedJumpForce;
+            // }
         }
     }
-    void OnCollisionEnter2D(Collision2D other)
+    void checkGround()
     {
-        if (other.gameObject.CompareTag("MidGround") || other.gameObject.CompareTag("BottomGround"))
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, dis, mask);
+
+        if (hit.collider != null)
         {
-            cameraManager.camPos = transform.position.y + 2.2f;
+            Debug.Log(hit.collider.name);
+            cameraManager.camPos = transform.position.y + 1.5f - dis;//원래2.3
             isJumped = false;
             jumpCount = 0;
+            anim.SetBool("isJump", false);
+        }
+    }
+    void OnDrawGizmos()
+    {
+        Debug.DrawRay(transform.position - new Vector3(transform.position.x, transform.localScale.y / 2, 0), Vector2.down * dis, Color.red);
+    }
+    void OnCollisionStay2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("BottomGround"))
+        {
+            checkGround();
         }
     }
     void OnTriggerEnter2D(Collider2D other)

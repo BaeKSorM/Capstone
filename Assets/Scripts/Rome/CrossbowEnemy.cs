@@ -24,7 +24,7 @@ public class CrossbowEnemy : Creature
     void Start()
     {
         speed = 5.0f;
-        range = 7.0f;
+        // range = 7.0f;
         time = 1.0f;
         delayTime = 1.0f;
         action = 5.0f;
@@ -63,7 +63,7 @@ public class CrossbowEnemy : Creature
     {
         anim.SetBool("isDamaged", true);
         Debug.Log(rb.velocity.y);
-        rb.AddForce(new Vector2(transform.localScale.x * 2, 2), ForceMode2D.Impulse);
+        rb.AddForce(new Vector2(transform.localScale.x * 4, 2), ForceMode2D.Impulse);
         Debug.Log(rb.velocity.y);
         isDamaged = false;
     }
@@ -71,11 +71,11 @@ public class CrossbowEnemy : Creature
     {
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
-            float LR = ((other.transform.position.x > transform.position.x) ? -1 : 1);
+            float LR = ((other.transform.position.x > transform.position.x) ? -0.5f : 0.5f);
             // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoidingAttack && !isAvoiding && !isWall)
             {
-                transform.localScale = new Vector2(-LR, 1);
+                transform.localScale = new Vector2(-LR, 0.5f);
                 isAvoiding = true;
                 float pl = (transform.position.x > other.transform.position.x) ? action : -action;
                 StartCoroutine(Avoidance(new Vector2(transform.position.x + pl, transform.position.y), other));
@@ -85,7 +85,7 @@ public class CrossbowEnemy : Creature
             else if (!isAvoiding)
             {
                 //공격하고 다시 false로 바뀜
-                transform.localScale = new Vector2(LR, 1);
+                transform.localScale = new Vector2(LR, 0.5f);
                 GameObject arrowClone = Instantiate(arrow, gameObject.transform.position + new Vector3(-LR, 0, 0), Quaternion.identity);
                 EnemyArrow enemyArrow = arrowClone.GetComponent<EnemyArrow>();
                 enemyArrow.LR = -LR;
@@ -146,10 +146,10 @@ public class CrossbowEnemy : Creature
     IEnumerator Avoidance(Vector2 arrivePos, Collider2D other)
     {
         Debug.Log("Avoidance");
-        float LR = ((other.transform.position.x > transform.position.x) ? 1 : -1);
+        float LR = ((other.transform.position.x > transform.position.x) ? 0.5f : -0.5f);
 
         // arrivePos에 도착할때까지 이동
-        transform.localScale = new Vector2(LR, 1);
+        transform.localScale = new Vector2(LR, 0.5f);
         while (Mathf.Abs(transform.position.x - arrivePos.x) > 0.1f && !isWall)
         {
             transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos.x, transform.position.y), avoidSpeed * Time.deltaTime);

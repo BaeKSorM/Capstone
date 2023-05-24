@@ -444,8 +444,8 @@ Transform:
   m_GameObject: {fileID: 8686734914517963024}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8686734914149248794}
   m_RootOrder: 1
@@ -585,8 +585,10 @@ MonoBehaviour:
   arrow: {fileID: 3113215153502830515, guid: 645cf8205165d9f439ec1ed8458b88ee, type: 3}
   enemyHpBar: {fileID: 0}
   wallDistance: 1
+  avoidSpeed: 5
   isAvoidingAttack: 0
   isAvoiding: 0
+  isDamaged: 0
   isWall: 0
   avoidingTime: 0
 --- !u!114 &8686734914517963032

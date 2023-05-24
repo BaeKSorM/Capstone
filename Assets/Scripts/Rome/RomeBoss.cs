@@ -132,7 +132,6 @@ public class RomeBoss : MonoBehaviour
             Debug.Log(i);
         }
 
-        //소환하고 그다음 진행안됨
     }
     IEnumerator SpawnMobMove(GameObject notInGameMob)
     {
@@ -199,7 +198,7 @@ public class RomeBoss : MonoBehaviour
         weapon.SetActive(true);
         do
         {
-            transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.1f);
             // 왼쪽으로 이동할때 왼쪽벽 위치보다 왼쪽으로 가면 오른쪽으로 이동
             // 왼쪽으로 가려면 -1 오른쪽에 있으면 1
             if (cameraManager.bossGroundCenter.x + -LR * 10 == transform.position.x)
