@@ -12,7 +12,7 @@ public class FadeInOut : MonoBehaviour
     [SerializeField] internal enum InOrOut { In, Out, Default };
     [SerializeField] internal InOrOut inOrOut;
     [SerializeField] internal Image background;
-    float ff;
+    internal bool fOut;
     private void Awake()
     {
         instance = this;
@@ -39,9 +39,7 @@ public class FadeInOut : MonoBehaviour
         while (background.color.a > 0)
         {
             background.color -= new Color(0, 0, 0, 1 / (fadeTime * 100));
-            ff += Time.deltaTime;
             yield return new WaitForSeconds(0.01f);
-            ff += 0.01f;
         }
         // 인 시간
         // Debug.Log(ff);
@@ -54,5 +52,6 @@ public class FadeInOut : MonoBehaviour
             background.color += new Color(0, 0, 0, 1 / (fadeTime * 100));
             yield return new WaitForSeconds(0.01f);
         }
+        fOut = true;
     }
 }

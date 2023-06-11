@@ -9,29 +9,33 @@ public class CrossbowEnemy : Creature
     [Tooltip("공격 거리")]
     [SerializeField] internal float dangerRange = 2.0f;
     [SerializeField] internal GameObject arrow;
+    [SerializeField] internal Transform player;
     [SerializeField] internal Transform enemyHpBar;
+    [SerializeField] internal Transform shootPos;
     [SerializeField] internal float wallDistance = 0.5f;
     [SerializeField] internal float avoidSpeed = 5.0f;
-    [SerializeField] internal bool isAvoidingAttack;
     [SerializeField] internal bool isAvoiding;
     [SerializeField] internal bool isDamaged;
+    [SerializeField] internal bool isMoveOpposite;
     [SerializeField] bool isWall;
     [SerializeField] internal float avoidingTime = 1.0f;
-
+    [SerializeField] internal int LR;
+    [SerializeField] internal bool isSpawned;
     Canvas canvas;
-    Rigidbody2D rb;
+    Rigidbody2D EnemyRB;
     RaycastHit2D[] hit;
     void Start()
     {
-        speed = 5.0f;
+        // speed = 5.0f;
         // range = 7.0f;
-        time = 1.0f;
-        delayTime = 1.0f;
-        action = 5.0f;
+        // time = 1.0f;
+        // delayTime = 1.0f;
+        // action = 5.0f;
         attackDamage = 2.5f;
-        dangerRange = 2.0f;
+        // dangerRange = 2.0f;
+        player = GameObject.Find("Player").transform;
         wallDistance = 1.0f;
-        rb = GetComponent<Rigidbody2D>();
+        EnemyRB = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         Instance = this;
         enemyHpBar = transform.parent.GetChild(0).GetChild(0);
@@ -43,59 +47,63 @@ public class CrossbowEnemy : Creature
         if (other.CompareTag("PlayerWeapon"))
         {
             hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
+            LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
         }
     }
-    void OnTriggerStay2D(Collider2D other)
+    IEnumerator OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("AttackSight") && !isWall && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged)
         {
             // 공격범위에 들어옴;
-            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack && !isAvoiding)
+            while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack && !isAvoiding)
             {
                 // Debug.Log("run");
-                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
+                anim.SetBool("isAttack", false);
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), 0.001f);
+                yield return null;
             }
             StartCoroutine(Attack(other));
         }
     }
     void Damaged()
     {
-        anim.SetBool("isDamaged", true);
-        Debug.Log(rb.velocity.y);
-        rb.AddForce(new Vector2(transform.localScale.x * 4, 2), ForceMode2D.Impulse);
-        Debug.Log(rb.velocity.y);
+        anim.SetTrigger("isDamaged");
+        EnemyRB.AddForce(new Vector2(LR * 4, 0), ForceMode2D.Impulse);
         isDamaged = false;
     }
     IEnumerator Attack(Collider2D other)
     {
-        while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
+        while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack && !isWall)
         {
-            float LR = ((other.transform.position.x > transform.position.x) ? -0.5f : 0.5f);
+            float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
             // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
-            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoidingAttack && !isAvoiding && !isWall)
+            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoiding && !isWall)
             {
-                transform.localScale = new Vector2(-LR, 0.5f);
+                anim.CrossFade("Crossbow_Run", 0f);
+                transform.localScale = new Vector2(-LR, 1f);
                 isAvoiding = true;
                 float pl = (transform.position.x > other.transform.position.x) ? action : -action;
                 StartCoroutine(Avoidance(new Vector2(transform.position.x + pl, transform.position.y), other));
                 yield return new WaitForSeconds(avoidingTime);
             }
             // 공격
-            else if (!isAvoiding)
+            else if (!isAvoiding && !isWall)
             {
-                //공격하고 다시 false로 바뀜
-                transform.localScale = new Vector2(LR, 0.5f);
-                GameObject arrowClone = Instantiate(arrow, gameObject.transform.position + new Vector3(-LR, 0, 0), Quaternion.identity);
-                EnemyArrow enemyArrow = arrowClone.GetComponent<EnemyArrow>();
-                enemyArrow.LR = -LR;
+                // Debug.Log("attack");
                 isAttack = true;
+                isAvoiding = true;
                 anim.SetBool("isAttack", true);
-                yield return new WaitForSeconds(enemyArrow.arrowDestroyTime);
-                anim.SetBool("isAttack", false);
+                //공격하고 다시 false로 바뀜
+                transform.localScale = new Vector2(LR, 1f);
+                yield return new WaitForSeconds(delayTime);
+                GameObject arrowClone = Instantiate(arrow, shootPos.position, Quaternion.identity);
+                arrowClone.transform.parent = transform.parent;
+                EnemyArrow enemyArrow = arrowClone.GetComponent<EnemyArrow>();
+                enemyArrow.LR = LR;
                 yield return new WaitForSeconds(time);
                 isAttack = false;
-                isAvoidingAttack = false;
+                isAvoiding = false;
             }
             else
             {
@@ -106,18 +114,26 @@ public class CrossbowEnemy : Creature
     void Update()
     {
         EnemyHp(enemyHpBar);
+    }
+    void FixedUpdate()
+    {
         CheckWall();
     }
+    [SerializeField] LayerMask mask;
     void CheckWall()
     {
         hit = Physics2D.RaycastAll(transform.position, Vector2.left * transform.localScale.x, wallDistance);
         for (int i = 0; i < hit.Length; ++i)
         {
+            // Debug.Log(hit[i].collider.tag);
+            // Debug.Log(isWall);
+            // Debug.Log(hit[i].collider.tag == "Wall" && !isWall);
             if (hit[i].collider.tag == "Wall" && !isWall)
             {
-                if (!RomeBoss.instance.isSpawning)
+                if (!RomeBoss.instance.isSummoning)
                 {
                     isWall = true;
+                    StopAllCoroutines();
                     StartCoroutine(oppositeTheWall());
                 }
             }
@@ -125,19 +141,16 @@ public class CrossbowEnemy : Creature
     }
     IEnumerator oppositeTheWall()
     {
-        Debug.Log("oppositeTheWall");
-
-        float arrivePos = transform.position.x + transform.localScale.x * action;
+        anim.CrossFade("Crossbow_Run", 0f);
+        transform.localScale = new Vector2(-LR, 1);
+        float arrivePos = transform.position.x + transform.localScale.x * -action;
         while (Mathf.Abs(transform.position.x - arrivePos) > 0.1f)
         {
             transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos, transform.position.y), avoidSpeed * Time.deltaTime);
             yield return new WaitForSeconds(0.001f);
-            // Debug.Log(transform.position);
-            // Debug.Log(new Vector2(arrivePos, transform.position.y));
-            // Debug.Log(Mathf.Abs(transform.position.x - arrivePos));
-            // Debug.Log((Mathf.Abs(transform.position.x - arrivePos) > 0.1f));
         }
         isWall = false;
+        isAvoiding = false;
     }
     void EnemyHp(Transform _enemyHpBar)
     {
@@ -145,17 +158,24 @@ public class CrossbowEnemy : Creature
     }
     IEnumerator Avoidance(Vector2 arrivePos, Collider2D other)
     {
-        Debug.Log("Avoidance");
-        float LR = ((other.transform.position.x > transform.position.x) ? 0.5f : -0.5f);
+        anim.SetBool("isAttack", false);
+        anim.CrossFade("Crossbow_Run", 0f);
+        // Debug.Log("Avoidance");
+        LR = other.transform.position.x > transform.position.x ? 1 : -1;
 
         // arrivePos에 도착할때까지 이동
-        transform.localScale = new Vector2(LR, 0.5f);
+        transform.localScale = new Vector2(LR, 1f);
         while (Mathf.Abs(transform.position.x - arrivePos.x) > 0.1f && !isWall)
         {
             transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos.x, transform.position.y), avoidSpeed * Time.deltaTime);
             yield return new WaitForSeconds(0.001f);
         }
-        isAvoiding = false;
-        isAvoidingAttack = true;
+        transform.localScale = new Vector2(-LR, 1f);
+        yield return new WaitForSeconds(avoidingTime);
+        anim.SetBool("isAttack", true);
+        if (!isWall)
+        {
+            isAvoiding = false;
+        }
     }
 }

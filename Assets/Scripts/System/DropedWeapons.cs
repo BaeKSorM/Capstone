@@ -23,12 +23,12 @@ public class DropedWeapons : MonoBehaviour
                 maxdamage = Random.Range(24, 29);
                 break;
             case eTypeOfWeapon.석궁:
-
+                mindamage = Random.Range(8, 13);
+                maxdamage = Random.Range(24, 29);
                 break;
             case eTypeOfWeapon.방패:
-                // mindamage = Random.Range(8, 13);
-                // maxdamage = Random.Range(24, 29);
-                mindamage = maxdamage = 1;
+                mindamage = Random.Range(8, 13);
+                maxdamage = Random.Range(24, 29);
                 break;
         }
     }

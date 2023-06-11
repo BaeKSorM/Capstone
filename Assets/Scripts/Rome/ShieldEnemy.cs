@@ -14,7 +14,11 @@ public class ShieldEnemy : Creature
     [Tooltip("막는 중일때 방패에 닿였는지")]
     [SerializeField] internal bool defend;
     [SerializeField] internal Transform enemyHpBar;
-    Rigidbody2D rb;
+    [SerializeField] internal bool damageOn;
+    [SerializeField] internal bool isDamaged;
+    [SerializeField] internal int LR;
+
+    Rigidbody2D EnemyRB;
     Canvas canvas;
     void Start()
     {
@@ -25,7 +29,7 @@ public class ShieldEnemy : Creature
         action = 5.0f;
         attackDamage = 2.5f;
         anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
+        EnemyRB = GetComponent<Rigidbody2D>();
         enemyHpBar = transform.parent.GetChild(0).GetChild(0);
         canvas = transform.parent.GetChild(0).GetComponent<Canvas>();
         canvas.worldCamera = Camera.main;
@@ -36,7 +40,7 @@ public class ShieldEnemy : Creature
         if (other.CompareTag("PlayerWeapon"))
         {
             // Debug.Log(other.transform.parent.name);
-            if (transform.localScale.x != other.transform.parent.localScale.x)
+            if (transform.localScale.x == other.transform.parent.localScale.x)
             {
                 defend = true;
             }
@@ -46,26 +50,30 @@ public class ShieldEnemy : Creature
             }
             if (!isDefending)
             {
+                LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
+                Damaged();
                 hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
             }
             else if (isDefending)
             {
-                Debug.Log(0);
+                Debug.Log("Def");
                 if (!defend)
                 {
-                    Debug.Log(1);
+                    Debug.Log("dam");
+                    LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
+                    Damaged();
                     hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
                 }
                 else if (defend)
                 {
-                    Debug.Log(2);
+                    Debug.Log("shie");
                 }
             }
         }
     }
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("AttackSight"))
+        if (other.CompareTag("AttackSight") && !isDamaged)
         {
             // 공격범위에 들어옴;
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
@@ -83,6 +91,12 @@ public class ShieldEnemy : Creature
     {
         _enemyHpBar.position = new Vector2(transform.position.x, transform.position.y + transform.localScale.y / 2 + 0.5f);
     }
+    void Damaged()
+    {
+        anim.SetTrigger("isDamaged");
+        EnemyRB.AddForce(new Vector2(LR * 4, 0), ForceMode2D.Impulse);
+        isDamaged = false;
+    }
     IEnumerator Attack(Collider2D other)
     {
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
@@ -91,23 +105,30 @@ public class ShieldEnemy : Creature
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
             {
                 //공격하고 다시 false로 바뀜
-                isAttack = true;
                 if (!holding)
                 {
+                    isAttack = true;
+                    anim.SetBool("isCrush", true);
+                    anim.CrossFade("Shield_Crush", 0f);
                     isDefending = true;
                     holding = true;
-                    yield return new WaitForSeconds(time);
-                    // 플레이어쪽으로 돌진할 방향
                     float pl = (transform.position.x > other.transform.position.x) ? -action : action;
+                    yield return new WaitForSeconds(time);
+                    damageOn = true;
+                    // 플레이어쪽으로 돌진할 방향
                     // 돌진 대기
                     // 막는 중 아님
                     isDefending = false;
                     //addforce 사용해서 돌진
-                    rb.AddForce(Vector2.right * pl * speed, ForceMode2D.Impulse);
-                    yield return new WaitForSeconds(2f);
-                    weapon.SetActive(true);
+                    EnemyRB.AddForce(Vector2.right * pl * speed, ForceMode2D.Impulse);
+                    yield return new WaitForSeconds(1f);
+                    isDefending = true;
+                    damageOn = false;
                     holding = false;
                     yield return new WaitForSeconds(delayTime);
+                    LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
+                    transform.localScale = new Vector3(LR, 1);
+                    anim.SetBool("isCrush", false);
                 }
                 isAttack = false;
             }

@@ -12,7 +12,7 @@ public class ReadyForBoss : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && GameManager.instance.enemies.Count == GameManager.instance.deadCount)
         {
             ready = true;
             transform.GetChild(0).gameObject.SetActive(true);

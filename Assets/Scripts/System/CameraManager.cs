@@ -6,7 +6,7 @@ public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance;
     [SerializeField] Transform player;
-    [SerializeField] Vector3 bossDoorFornt;
+    [SerializeField] internal Vector3 bossDoorFornt;
     Vector3 targetPos;
     [Tooltip("보스 스테이지 중앙 중앙")]
     [SerializeField] internal Vector3 bossGroundCenter;
@@ -40,18 +40,17 @@ public class CameraManager : MonoBehaviour
                 //화면 중간보다 위일때
                 if (player.position.y - 1.0f > camPos)
                 {
-
                     if (player.position.x >= bossDoorFornt.x)
                     {
                         targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
                     }
-                    else if (player.position.x > 0)
+                    else if (player.position.x > -5.0f)
                     {
                         targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(0, player.position.y, this.transform.position.z);
+                        targetPos = new Vector3(-5.0f, player.position.y, this.transform.position.z);
                     }
                     transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
                 }
@@ -63,13 +62,13 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(bossDoorFornt.x, player.position.y + 2.2f, this.transform.position.z);
                     }
-                    else if (player.position.x > 0)
+                    else if (player.position.x > -5.0f)
                     {
                         targetPos = new Vector3(player.position.x, player.position.y + 2.2f, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(0, player.position.y + 2.2f, this.transform.position.z);
+                        targetPos = new Vector3(-5.0f, player.position.y + 2.2f, this.transform.position.z);
                     }
                     transform.position = targetPos;
                 }
@@ -80,26 +79,39 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(bossDoorFornt.x, camPos, this.transform.position.z);
                     }
-                    else if (player.position.x > 0)
+                    else if (player.position.x > -5.0f)
                     {
                         targetPos = new Vector3(player.position.x, camPos, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(0, camPos, this.transform.position.z);
+                        targetPos = new Vector3(-5.0f, camPos, this.transform.position.z);
                     }
                     transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
                 }
             }
             else if (ground == eGround.mid)
             {
-
+                if (player.position.x >= bossDoorFornt.x)
+                {
+                    targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
+                }
+                else if (player.position.x > -5.0f)
+                {
+                    targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
+                }
+                else
+                {
+                    targetPos = new Vector3(-5.0f, player.position.y, this.transform.position.z);
+                }
+                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
             }
         }
         else
         if (GameManager.instance.bossAppear)
         {
             targetPos = bossGroundCenter;
+            Camera.main.orthographicSize = 5.0f;
             transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
         }
     }

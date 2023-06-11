@@ -15,8 +15,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] internal int dropEnemiesMaxCount;
     [Tooltip("적들넣어주기")]
     [SerializeField] internal List<GameObject> enemies;
-    // [Tooltip("드랍된 아이템에 닿였는지")]
-    // [SerializeField] internal List<bool> isTouching;
     [Tooltip("전에 밟은 아이템")]
     [SerializeField] internal int beforeSteped;
     [Tooltip("적이 떨어뜨린 무기들")]
@@ -25,6 +23,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] internal int dropedDeadCount;
     [Tooltip("죽은 적 수")]
     [SerializeField] internal int deadCount;
+    [Tooltip("보스 죽었나")]
+    [SerializeField] internal bool bossDie;
 
     [SerializeField] internal enum eAge { 로마, 현대, 미래 };
     [SerializeField] internal eAge age;
@@ -35,7 +35,9 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        // PlayerPrefs.SetInt("SaveLevel", 0);
+        // 첫스테이지
+        PlayerPrefs.SetInt("SaveLevel", 0);
+        // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
     }
     void Start()
     {
@@ -67,6 +69,10 @@ public class GameManager : MonoBehaviour
         enemiesDropedWeapons.GetChild(nearby_Item).GetChild(0).gameObject.SetActive(false);
         PlayerController.instance.isTouching = false;
     }
+    /// <summary>
+    /// 스테이지 불러오기
+    /// </summary>
+    /// <param name="_stageLevel">이동할 스테이지</param>
     public void stageStart(int _stageLevel)
     {
         saveStageLevel = _stageLevel;
@@ -74,10 +80,10 @@ public class GameManager : MonoBehaviour
     }
     public void GameClear()
     {
-        PlayerPrefs.SetInt("SaveLevel", saveStageLevel + 1);
+        PlayerPrefs.SetInt("SaveLevel", ++saveStageLevel);
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-        StartCoroutine(UIManager.instance.loading());
+        // UnityEditor.EditorApplication.isPlaying = false;
 #endif
+        StartCoroutine(UIManager.instance.loading());
     }
 }

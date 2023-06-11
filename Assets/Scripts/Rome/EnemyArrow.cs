@@ -5,13 +5,14 @@ using UnityEngine;
 public class EnemyArrow : MonoBehaviour
 {
     [SerializeField] private int rotateSpeed;
+    [SerializeField] private Vector3 shootPos;
     [SerializeField] private GameObject target;
     [SerializeField] internal float arrowDamage, damage;
-    [Tooltip("왼쪽을 바라보면 0")]
+    [Tooltip("왼쪽을 바라보면 1")]
     [SerializeField] internal float LR;
     [Tooltip("화살 사라지는 시간")]
     [SerializeField] internal float arrowDestroyTime = 1.0f;
-    Vector3 targetPos;
+    public Vector3 targetPos;
     void Awake()
     {
         damage = CrossbowEnemy.Instance.attackDamage;
@@ -19,15 +20,17 @@ public class EnemyArrow : MonoBehaviour
     void Start()
     {
         StartCoroutine(Shoot());
+        // shootPos =
     }
     IEnumerator Shoot()
     {
-        targetPos = new Vector3(LR * 10, transform.position.y);
+        targetPos = transform.position * Vector2.left * 10 * transform.parent.GetChild(1).localScale.x;
         while (transform.position != targetPos)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, 0.2f);
+            transform.position = Vector2.MoveTowards(transform.position, targetPos, 0.1f);
             yield return new WaitForSeconds(0.01f);
         }
+        Debug.Log(targetPos);
         Destroy(gameObject);
     }
     void OnTriggerEnter2D(Collider2D other)

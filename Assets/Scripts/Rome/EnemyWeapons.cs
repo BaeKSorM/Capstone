@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class EnemyWeapons : MonoBehaviour
 {
-    [SerializeField] internal float damage;
-    [SerializeField] internal float attackDamage;
     RestEnemy restEnemy;
     void Start()
     {
-        restEnemy = transform.parent.GetComponent<RestEnemy>();
-        attackDamage = restEnemy.attackDamage;
+        restEnemy = GetComponent<RestEnemy>();
+    }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            RestEnemy.Instance.attackDamage = RestEnemy.Instance.saveDamage;
+        }
+        else
+        {
+            RestEnemy.Instance.attackDamage = 0;
+        }
     }
 }

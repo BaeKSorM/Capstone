@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
@@ -11,8 +14,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 1.0f;
     [Tooltip("점프 힘")]
     [SerializeField] private float jumpForce = 1.0f;
-    // [Tooltip("감속된 점프 힘")]
-    // [SerializeField] private float deceleratedJumpForce = 1.0f;
+    [Tooltip("감속된 점프 힘")]
+    [SerializeField] private float deceleratedJumpForce = 1.0f;
     [Tooltip("더블 점프 체크")]
     [SerializeField] private bool isJumped;
     [Tooltip("점프 횟수")]
@@ -22,6 +25,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("무기")]
     [SerializeField] internal string[] weaponNames;
     [SerializeField] internal GameObject[] getWeapons;
+    [SerializeField] internal GameObject dropedWeapons;
     [SerializeField] internal string weaponAnimName;
     [Tooltip("무기별 공격 시간")]
     [SerializeField] internal float time;
@@ -33,21 +37,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal bool isTouching;
     [SerializeField] internal float reduceDamage;
     [SerializeField] internal GameObject fadeCan;
-    [SerializeField] internal GameObject rome;
     [SerializeField] internal Camera mainCam;
     [SerializeField] internal Vector3 bossReadyPos;
     [SerializeField] private LayerMask mask;
     [SerializeField] private float dis;
     FadeInOut fadeInOut;
     CameraManager cameraManager;
-    RomeBoss romeBoss;
     void Awake()
     {
         instance = this;
     }
     private IEnumerator Start()
     {
-        romeBoss = rome.GetComponent<RomeBoss>();
         time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         playerRB = GetComponent<Rigidbody2D>();
         fadeInOut = fadeCan.GetComponent<FadeInOut>();
@@ -66,14 +67,7 @@ public class PlayerController : MonoBehaviour
             Jump();
             if (!anim.GetBool("isAttack"))
             {
-                if (playerRB.velocity.x > 0.04f)
-                {
-                    transform.localScale = new Vector2(1, 1);
-                }
-                if (playerRB.velocity.x < -0.04f)
-                {
-                    transform.localScale = new Vector2(-1, 1);
-                }
+                ViewDirection();
                 if (Input.GetButtonDown("Fire1"))
                 {
                     StartCoroutine(Attack());
@@ -93,6 +87,10 @@ public class PlayerController : MonoBehaviour
                     else if (isTouching)
                     {
                         getWeapon();
+                    }
+                    else if (GameManager.instance.bossDie)
+                    {
+                        StartCoroutine(NextStage());
                     }
                 }
             }
@@ -124,24 +122,39 @@ public class PlayerController : MonoBehaviour
     {
         //fadeinout하고 보스스테이지위치로
         isCinematic = true;
+        anim.SetBool("isMove", false);
+        anim.SetBool("isAttack", false);
         fadeInOut.inOrOut = FadeInOut.InOrOut.Out;
         yield return new WaitForSeconds(fadeInOut.fadeTime * 2);
         // -1을 보스 바닥 y 위치로 바꾸기
-        transform.localScale = new Vector3(1, 1);
+        transform.localScale = new Vector3(-1, 1);
         transform.GetChild(1).localScale = new Vector2(40, 20);
         transform.position = new Vector2(cameraManager.bossGroundCenter.x, cameraManager.bossGroundCenter.y);
         GameManager.instance.bossAppear = true;
         fadeInOut.inOrOut = FadeInOut.InOrOut.In;
         // 도망 이동 시키기
         yield return new WaitForSeconds(1.0f);
+        anim.SetBool("isMove", true);
         while (transform.position != bossReadyPos)
         {
             transform.position = Vector2.MoveTowards(transform.position, bossReadyPos, 0.1f);
             yield return null;
         }
+        transform.localScale = new Vector3(1, 1);
         bossCanMove = true;
         //fightReady 끝나는 시간
         isCinematic = false;
+    }
+    private void ViewDirection()
+    {
+        if (playerRB.velocity.x > 0.04f)
+        {
+            transform.localScale = new Vector2(1, 1);
+        }
+        if (playerRB.velocity.x < -0.04f)
+        {
+            transform.localScale = new Vector2(-1, 1);
+        }
     }
     private void Move()
     {
@@ -222,11 +235,11 @@ public class PlayerController : MonoBehaviour
                 //두번 빨리 누르면 낮게 점프하고 천천히 누르면 높게 점프한다 like skul
                 isJumped = true;
             }
-            // else
-            // {
-            //     //playerRB.AddForce(Vector2.up * deceleratedJumpForce, ForceMode2D.Impulse);
-            //     playerRB.velocity = Vector2.up * deceleratedJumpForce;
-            // }
+            else
+            {
+                //playerRB.AddForce(Vector2.up * deceleratedJumpForce, ForceMode2D.Impulse);
+                playerRB.velocity = Vector2.up * deceleratedJumpForce;
+            }
         }
     }
     void checkGround()
@@ -235,18 +248,13 @@ public class PlayerController : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Debug.Log(hit.collider.name);
             cameraManager.camPos = transform.position.y + 1.5f - dis;//원래2.3
             isJumped = false;
             jumpCount = 0;
             anim.SetBool("isJump", false);
         }
     }
-    void OnDrawGizmos()
-    {
-        Debug.DrawRay(transform.position - new Vector3(transform.position.x, transform.localScale.y / 2, 0), Vector2.down * dis, Color.red);
-    }
-    void OnCollisionStay2D(Collision2D other)
+    void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("BottomGround"))
         {
@@ -259,6 +267,14 @@ public class PlayerController : MonoBehaviour
         {
             Damaged(other);
         }
+
+    }
+    IEnumerator NextStage()
+    {
+        Debug.Log("clear");
+        anim.SetTrigger("isClear");
+        yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo(0).Length);
+        GameManager.instance.GameClear();
     }
     void Damaged(Collider2D other)
     {
@@ -269,10 +285,12 @@ public class PlayerController : MonoBehaviour
                 float aDamage = other.GetComponent<EnemyArrow>().arrowDamage;
                 hpbar.value -= (aDamage - reduceDamage) > 0 ? (aDamage - reduceDamage) : 0;
             }
-            else if (other.name.Contains("shield"))
+            else if (other.name.Contains("Shield"))
             {
-                if (other.GetComponentInParent<ShieldEnemy>().holding)
+                Debug.Log(other.GetComponentInParent<ShieldEnemy>().damageOn);
+                if (other.GetComponentInParent<ShieldEnemy>().damageOn)
                 {
+                    Debug.Log("sd");
                     float sDamage = other.GetComponentInParent<ShieldEnemy>().attackDamage;
                     hpbar.value -= (sDamage - reduceDamage) > 0 ? (sDamage - reduceDamage) : 0;
                 }
@@ -284,9 +302,16 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                Debug.Log(other.name);
                 float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
                 hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
             }
+            Debug.Log(other.name);
+        }
+        if (hpbar.value == 0)
+        {
+            PlayerPrefs.SetInt("SaveLevel", 0);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }

@@ -35,9 +35,10 @@ public class RomeBoss : MonoBehaviour
     [SerializeField] internal GameObject weapon;
     [SerializeField] internal GameObject spawnedMobs;
     [SerializeField] internal bool enterance;
-    [SerializeField] internal bool isSpawning;
+    [SerializeField] internal bool isSummoning;
     [SerializeField] internal int summonEnemiesCount = 5;
     [SerializeField] internal int maxSpawnMobsCount = 5;
+    [SerializeField] internal int arriveSpawnedMobs;
     [SerializeField] Vector3 bossAppear = new Vector2(23, -1.99f);
     [SerializeField] internal CameraManager cameraManager;
     Rigidbody2D bossRB;
@@ -55,6 +56,7 @@ public class RomeBoss : MonoBehaviour
             StartCoroutine(BossAppear());
             enterance = true;
         }
+
     }
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -72,18 +74,22 @@ public class RomeBoss : MonoBehaviour
                 int LR = transform.position.x > player.position.x ? 1 : -1;
                 skillEnd = false;
                 // 확률도 조정해야함
-                switch (Random.Range(0, 4))
+                switch (Random.Range(0, 0))
                 {
                     case 0:
                         if (spawnedMobs.transform.childCount < maxSpawnMobsCount)
                         {
                             StartCoroutine(SpawnMobs());
                         }
-                        Debug.Log(0);
+                        else
+                        {
+                            skillEnd = true;
+                        }
+                        Debug.Log(1);
                         break;
                     case 1:
                         StartCoroutine(SpearPoking(LR));
-                        Debug.Log(1);
+                        // Debug.Log(2);
                         break;
                     case 2:
                         if (hpbar.value <= 80)
@@ -94,17 +100,20 @@ public class RomeBoss : MonoBehaviour
                         {
                             skillEnd = true;
                         }
-                        Debug.Log(2);
+                        // Debug.Log(3);
                         break;
                     case 3:
                         StartCoroutine(Crushing(LR));
-                        Debug.Log(3);
+                        // Debug.Log(4);
                         break;
                 }
                 yield return new WaitUntil(() => skillEnd);
             }
             yield return null;
         }
+        GameManager.instance.bossDie = true;
+        anim.SetTrigger("isDead");
+        Destroy(gameObject, anim.GetCurrentAnimatorStateInfo(0).length);
     }
     internal IEnumerator BossAppear()
     {
@@ -119,51 +128,60 @@ public class RomeBoss : MonoBehaviour
     }
     IEnumerator SpawnMobs()
     {
-        anim.SetBool("isSpawning", true);
-        isSpawning = true;
-        yield return new WaitForSeconds(0.2f);
+        anim.SetBool("isSummoning", true);
+        isSummoning = true;
+        yield return new WaitForSeconds(0.416f);
+        arriveSpawnedMobs = 0;
         for (int i = 0; i < summonEnemiesCount; ++i)
         {
             int enemy = Random.Range(0, summonEnemies.Length);
             GameObject spawnedMob = Instantiate(summonEnemies[enemy], summonPos, Quaternion.identity);
-            StartCoroutine(SpawnMobMove(spawnedMob));
             spawnedMob.transform.parent = spawnedMobs.transform;
+            StartCoroutine(SpawnMobMove(spawnedMob));
             yield return new WaitForSeconds(0.5f);
-            Debug.Log(i);
         }
-
+        while (arriveSpawnedMobs != summonEnemiesCount)
+        {
+            yield return null;
+        }
+        anim.SetBool("isSummoning", false);
+        isSummoning = false;
+        skillEnd = true;
     }
     IEnumerator SpawnMobMove(GameObject notInGameMob)
     {
-        while (notInGameMob.transform.position != new Vector3(cameraManager.bossGroundCenter.x, notInGameMob.transform.position.y))
+        float spawnTime = 0;
+        while (notInGameMob.transform.position != new Vector3(cameraManager.bossGroundCenter.x + 5, notInGameMob.transform.position.y))
         {
-            // Debug.Log("mobmove");
-            notInGameMob.transform.position = Vector2.MoveTowards(notInGameMob.transform.position, cameraManager.bossGroundCenter, 0.01f);
+            Debug.Log("mobmove");
+            notInGameMob.transform.position = Vector2.MoveTowards(notInGameMob.transform.position, cameraManager.bossDoorFornt, 0.01f);
             // yield return new WaitForSeconds(0.5f);
-            yield return null;
+            yield return new WaitForSeconds(0.01f);
+            spawnTime += 0.02f;
+            if (spawnTime >= 0.9)
+            {
+                break;
+            }
         }
-        yield return new WaitForSeconds(1.0f);
-        Debug.Log("end");
-        yield return new WaitForSeconds(1.0f);
-        anim.SetBool("isSpawning", false);
-        isSpawning = false;
-        skillEnd = true;
+        ++arriveSpawnedMobs;
+        // Debug.Log("end");
     }
     IEnumerator SpearPoking(int LR)
     {
         transform.localScale = new Vector2(LR, 1);
+        anim.SetBool("isRunning", true);
         while (Mathf.Abs(transform.position.x - player.position.x) > range)
         {
             transform.position = Vector2.MoveTowards(transform.position, new Vector2(player.position.x, transform.position.y), speed * Time.deltaTime);
             yield return null;
         }
+        anim.SetBool("isRunning", false);
         //공격하고 다시 false로 바뀜
         isAttack = true;
-        weapon.SetActive(true);
         anim.SetBool("isAttack", true);
-        yield return new WaitForSeconds(time);
+        yield return new WaitForSeconds(1.85f);
+        Debug.Log(anim.GetCurrentAnimatorClipInfo(0).Length);
         anim.SetBool("isAttack", false);
-        weapon.SetActive(false);
         yield return new WaitForSeconds(1.0f);
         skillEnd = true;
         isAttack = false;
@@ -187,31 +205,32 @@ public class RomeBoss : MonoBehaviour
         }
         skillEnd = true;
     }
+    public Vector3 arrivePos;
     IEnumerator Crushing(int LR)
     {
         Vector3 curPos = transform.position;
-        Vector3 arrivePos = new Vector2(cameraManager.bossGroundCenter.x - LR * 10, transform.position.y);
+        arrivePos = new Vector2(cameraManager.bossGroundCenter.x - LR * 10, transform.position.y);
         // Debug.Log(curPos);
         transform.localScale = new Vector2(LR, 1);
-
-        anim.SetBool("isCrushing", true);
         weapon.SetActive(true);
+        anim.SetBool("isCrushing", true);
         do
         {
-            transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.1f);
+            transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.02f);
             // 왼쪽으로 이동할때 왼쪽벽 위치보다 왼쪽으로 가면 오른쪽으로 이동
             // 왼쪽으로 가려면 -1 오른쪽에 있으면 1
             if (cameraManager.bossGroundCenter.x + -LR * 10 == transform.position.x)
             {
                 //수정
+                // Debug.Log("fixed");
                 transform.position = new Vector2(cameraManager.bossGroundCenter.x + LR * 10, transform.position.y);
                 arrivePos = curPos;
             }
             yield return null;
         } while (transform.position.x != curPos.x);
+        anim.SetBool("isCrushing", false);
         weapon.SetActive(false);
         yield return new WaitForSeconds(1.0f);
-        anim.SetBool("isCrushing", false);
         skillEnd = true;
     }
 }
