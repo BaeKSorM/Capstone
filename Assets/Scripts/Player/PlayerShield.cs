@@ -8,8 +8,6 @@ public class PlayerShield : PlayerWeapons
     {
         if (other.CompareTag("EnemyWeapon") && PlayerController.instance.weaponNames[0] == "Shield")
         {
-            PlayerController.instance.reduceDamage = Random.Range(PlayerController.instance.getWeapons[0].GetComponent<DropedWeapons>().mindamage, PlayerController.instance.getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
-
             if (other.name.Contains("Arrow"))
             {
                 Destroy(other.gameObject);

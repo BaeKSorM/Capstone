@@ -34,11 +34,15 @@ public class RestEnemy : Creature
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerWeapon"))
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("Z"))
         {
             hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
             LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
+        }
+        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
+        {
+            PlayerController.instance.Reduce();
         }
     }
     void OnTriggerStay2D(Collider2D other)
@@ -53,6 +57,13 @@ public class RestEnemy : Creature
                 transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
             }
             StartCoroutine(Attack(other));
+        }
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
+        {
+            PlayerController.instance.reduceDamage = 0;
         }
     }
     void Damaged()
@@ -78,9 +89,11 @@ public class RestEnemy : Creature
                 //공격하고 다시 false로 바뀜]
                 isAttack = true;
                 anim.SetBool("isAttack", true);
+                weapon.SetActive(true);
                 yield return new WaitForSeconds(time);
                 anim.SetBool("isMove", false);
                 anim.SetBool("isAttack", false);
+                weapon.SetActive(false);
                 yield return new WaitForSeconds(delayTime);
                 isAttack = false;
                 LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;

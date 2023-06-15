@@ -37,7 +37,7 @@ public class ShieldEnemy : Creature
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerWeapon"))
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("Z"))
         {
             // Debug.Log(other.transform.parent.name);
             if (transform.localScale.x == other.transform.parent.localScale.x)
@@ -70,6 +70,10 @@ public class ShieldEnemy : Creature
                 }
             }
         }
+        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
+        {
+            PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
+        }
     }
     void OnTriggerStay2D(Collider2D other)
     {
@@ -81,6 +85,13 @@ public class ShieldEnemy : Creature
                 transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
             }
             StartCoroutine(Attack(other));
+        }
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
+        {
+            PlayerController.instance.reduceDamage = 0;
         }
     }
     void Update()

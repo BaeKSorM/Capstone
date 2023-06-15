@@ -60,9 +60,13 @@ public class RomeBoss : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerWeapon"))
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("Z"))
         {
             hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
+        }
+        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
+        {
+            PlayerController.instance.Reduce();
         }
     }
     IEnumerator UseSkills()

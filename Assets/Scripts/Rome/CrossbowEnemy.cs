@@ -44,11 +44,15 @@ public class CrossbowEnemy : Creature
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerWeapon"))
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("Z"))
         {
             hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
             LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
+        }
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
+        {
+            PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
         }
     }
     IEnumerator OnTriggerStay2D(Collider2D other)
@@ -64,6 +68,13 @@ public class CrossbowEnemy : Creature
                 yield return null;
             }
             StartCoroutine(Attack(other));
+        }
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
+        {
+            PlayerController.instance.reduceDamage = 0;
         }
     }
     void Damaged()

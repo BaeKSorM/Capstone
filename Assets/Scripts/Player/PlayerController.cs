@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal Vector3 bossReadyPos;
     [SerializeField] private LayerMask mask;
     [SerializeField] private float dis;
+    [SerializeField] internal float reduce;
     FadeInOut fadeInOut;
     CameraManager cameraManager;
     void Awake()
@@ -68,7 +69,7 @@ public class PlayerController : MonoBehaviour
             if (!anim.GetBool("isAttack"))
             {
                 ViewDirection();
-                if (Input.GetButtonDown("Fire1"))
+                if (Input.GetKeyDown(KeyCode.LeftAlt))
                 {
                     StartCoroutine(Attack());
                 }
@@ -107,14 +108,13 @@ public class PlayerController : MonoBehaviour
     {
         playerRB.velocity = Vector2.zero;
         anim.SetBool("isAttack", true);
-        if (weaponNames[0] != "Shield")
-        {
-            transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
-        }
-        // transform.Find(weaponNames[0]).gameObject.SetActive(true);
+
+        reduce = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
+
+        transform.Find(weaponNames[0]).gameObject.SetActive(true);
         yield return new WaitForSeconds(time);
-        // transform.Find(weaponNames[0]).gameObject.SetActive(false);
-        reduceDamage = 0;
+        transform.Find(weaponNames[0]).gameObject.SetActive(false);
+        // reduceDamage = 0;
         transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = 0;
         anim.SetBool("isAttack", false);
     }
@@ -242,6 +242,11 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    internal void Reduce()
+    {
+        reduceDamage = reduce;
+        Debug.Log(reduceDamage);
+    }
     void checkGround()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, dis, mask);
@@ -306,12 +311,12 @@ public class PlayerController : MonoBehaviour
                 float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
                 hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
             }
-            Debug.Log(other.name);
+            // Debug.Log(other.name);
         }
-        if (hpbar.value == 0)
+        if (hpbar.value <= 0)
         {
             PlayerPrefs.SetInt("SaveLevel", 0);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene(GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")]);
         }
     }
 }
