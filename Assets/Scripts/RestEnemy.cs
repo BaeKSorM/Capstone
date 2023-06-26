@@ -40,9 +40,15 @@ public class RestEnemy : Creature
             LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
         }
-        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
+        if (other.CompareTag("Player"))
         {
-            PlayerController.instance.Reduce();
+            if (other.transform.Find("Shield").gameObject.activeSelf)
+            {
+                if (Mathf.Abs(transform.position.x - other.transform.position.x) > Mathf.Abs(transform.position.x - other.transform.Find("Shield").position.x) ? true : false)
+                {
+                    PlayerController.instance.Reduce();
+                }
+            }
         }
     }
     void OnTriggerStay2D(Collider2D other)
@@ -86,7 +92,7 @@ public class RestEnemy : Creature
         {
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
             {
-                //공격하고 다시 false로 바뀜]
+                //공격하고 다시 false로 바뀜
                 isAttack = true;
                 anim.SetBool("isAttack", true);
                 weapon.SetActive(true);

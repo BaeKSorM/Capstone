@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] internal enum eAge { 로마, 현대, 미래 };
     [SerializeField] internal eAge age;
+    [SerializeField] internal int saveAge;
 
 
     [Tooltip("보스 등장했는지")]
@@ -37,10 +38,14 @@ public class GameManager : MonoBehaviour
         instance = this;
         // 첫스테이지
         PlayerPrefs.SetInt("SaveLevel", 0);
+        PlayerPrefs.SetFloat("PlayerHp", 100);
+        PlayerPrefs.SetInt("age", saveAge);
         // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
     }
     void Start()
     {
+        age = (eAge)PlayerPrefs.GetInt("age");
+        PlayerController.instance.hpbar.value = PlayerPrefs.GetFloat("PlayerHp");
         for (int i = 0; i < dropEnemiesMaxCount; ++i)
         {
             int rand = Random.Range(0, enemies.Count);
@@ -52,6 +57,14 @@ public class GameManager : MonoBehaviour
             {
                 --i;
             }
+        }
+    }
+    void Update()
+    {
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
         }
     }
     internal void show_ItemInfo(int nearby_Item)

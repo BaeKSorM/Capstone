@@ -1,0 +1,526 @@
+fileFormatVersion: 2
+guid: e68d1a84ba0695c47a20214d63fb5f4a
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 35
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Explosion (2)_48
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 517
+        width: 43
+        height: 58
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e35ab1bcff9f9d4a90c181486c59d9c
+      internalID: 879423219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_49
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 515
+        width: 58
+        height: 66
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0be35a230913a8147bccd1f5efd8c781
+      internalID: -1037058027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_50
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 513
+        width: 67
+        height: 69
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 204765bbc2a0eea41b2a1824103c8bd7
+      internalID: -17646014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_51
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 513
+        width: 78
+        height: 69
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7219a56ce8ea3274c96d6060fa967d69
+      internalID: 626626726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_61
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 517
+        width: 34
+        height: 41
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b996abc878f8396428421aa6e44da9fd
+      internalID: 1589818748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_210
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 512
+        width: 62
+        height: 67
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa058e6b3a212c14495b5007c443729b
+      internalID: -1141864184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_57
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 508
+        width: 102
+        height: 73
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2cc2d3bd8498c6547bd10dc03f0937ba
+      internalID: 560042058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explosion (2)_58
+      rect:
+        serializedVersion: 2
+        x: 714
+        y: 510
+        width: 69
+        height: 66
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 778de1d5874467e4d8750b1d76410c88
+      internalID: -1713238283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Explosion (2)_0: 1862379469
+      Explosion (2)_1: -980375902
+      Explosion (2)_10: -1130721374
+      Explosion (2)_100: -1744452673
+      Explosion (2)_101: 1877577426
+      Explosion (2)_102: 782183478
+      Explosion (2)_103: 589986670
+      Explosion (2)_104: -1002417325
+      Explosion (2)_105: -1360321374
+      Explosion (2)_106: 500213449
+      Explosion (2)_107: 245089053
+      Explosion (2)_108: 1107697543
+      Explosion (2)_109: 757441525
+      Explosion (2)_11: -1747395359
+      Explosion (2)_110: -1066199333
+      Explosion (2)_111: -123005981
+      Explosion (2)_112: -440619398
+      Explosion (2)_113: 160750849
+      Explosion (2)_114: -2018930500
+      Explosion (2)_115: 616661403
+      Explosion (2)_116: 998989385
+      Explosion (2)_117: 2037571936
+      Explosion (2)_118: -409318774
+      Explosion (2)_119: -876358241
+      Explosion (2)_12: -1055598431
+      Explosion (2)_120: -610945710
+      Explosion (2)_121: 1388893944
+      Explosion (2)_122: -1938540216
+      Explosion (2)_123: 1774042209
+      Explosion (2)_124: 1283442108
+      Explosion (2)_125: -49924207
+      Explosion (2)_126: -1169441203
+      Explosion (2)_127: -1706869915
+      Explosion (2)_128: -1596333784
+      Explosion (2)_129: 1355433916
+      Explosion (2)_13: 536908153
+      Explosion (2)_130: 1764465142
+      Explosion (2)_131: 1263494683
+      Explosion (2)_132: 2118688824
+      Explosion (2)_133: 300500339
+      Explosion (2)_134: -1669689065
+      Explosion (2)_135: 656990367
+      Explosion (2)_136: 649075206
+      Explosion (2)_137: -710001304
+      Explosion (2)_138: -1522449567
+      Explosion (2)_139: 254198904
+      Explosion (2)_14: -379936489
+      Explosion (2)_140: -853021701
+      Explosion (2)_141: 1707398184
+      Explosion (2)_142: 200382095
+      Explosion (2)_143: 1582217447
+      Explosion (2)_144: 1662211613
+      Explosion (2)_145: 1294199286
+      Explosion (2)_146: -1284569316
+      Explosion (2)_147: 1955700254
+      Explosion (2)_148: 129477071
+      Explosion (2)_149: 1652565156
+      Explosion (2)_15: 456470782
+      Explosion (2)_150: -1444237686
+      Explosion (2)_151: 1251207895
+      Explosion (2)_152: 641654543
+      Explosion (2)_153: 566679764
+      Explosion (2)_154: 935891829
+      Explosion (2)_155: 123243413
+      Explosion (2)_156: -1064841524
+      Explosion (2)_157: 1242519251
+      Explosion (2)_158: -199241139
+      Explosion (2)_159: 1133611079
+      Explosion (2)_16: 1796134467
+      Explosion (2)_160: 13818465
+      Explosion (2)_161: -1271964357
+      Explosion (2)_162: 415031370
+      Explosion (2)_163: -1547120437
+      Explosion (2)_164: 1125558941
+      Explosion (2)_165: -1340182091
+      Explosion (2)_166: -947965963
+      Explosion (2)_167: 271578412
+      Explosion (2)_168: 142863709
+      Explosion (2)_169: 523502606
+      Explosion (2)_17: -627612910
+      Explosion (2)_170: 296475660
+      Explosion (2)_171: -893010932
+      Explosion (2)_172: -1477146815
+      Explosion (2)_173: -1926765886
+      Explosion (2)_174: 907951849
+      Explosion (2)_175: 93733860
+      Explosion (2)_176: -792898998
+      Explosion (2)_177: 1306674932
+      Explosion (2)_178: 705685293
+      Explosion (2)_179: -808517770
+      Explosion (2)_18: 184554661
+      Explosion (2)_180: -1474432925
+      Explosion (2)_181: -499408978
+      Explosion (2)_182: -405074432
+      Explosion (2)_183: 189739761
+      Explosion (2)_184: 1544997780
+      Explosion (2)_185: -1103169742
+      Explosion (2)_186: 490912774
+      Explosion (2)_187: -1152033188
+      Explosion (2)_188: -1306061194
+      Explosion (2)_189: 1427652831
+      Explosion (2)_19: 634742492
+      Explosion (2)_190: 851803056
+      Explosion (2)_191: -1578001940
+      Explosion (2)_192: -98226892
+      Explosion (2)_193: 985541800
+      Explosion (2)_194: 362213868
+      Explosion (2)_195: -1073500789
+      Explosion (2)_196: -700672127
+      Explosion (2)_197: -426684882
+      Explosion (2)_198: 376346220
+      Explosion (2)_199: 1391509251
+      Explosion (2)_2: 1642281657
+      Explosion (2)_20: -1554166388
+      Explosion (2)_200: -634485517
+      Explosion (2)_201: 1556712670
+      Explosion (2)_202: -1505591256
+      Explosion (2)_203: 1857473312
+      Explosion (2)_204: 276351652
+      Explosion (2)_205: 440553501
+      Explosion (2)_206: -1923946082
+      Explosion (2)_207: -1708859069
+      Explosion (2)_208: -691880115
+      Explosion (2)_209: 230841238
+      Explosion (2)_21: -743627678
+      Explosion (2)_210: -1141864184
+      Explosion (2)_22: 470411711
+      Explosion (2)_23: 1523821936
+      Explosion (2)_24: -578112655
+      Explosion (2)_25: 1960795847
+      Explosion (2)_26: 1179026628
+      Explosion (2)_27: 1256766092
+      Explosion (2)_28: 1977916121
+      Explosion (2)_29: -1503648073
+      Explosion (2)_3: 896062959
+      Explosion (2)_30: 1439561681
+      Explosion (2)_31: 1248744182
+      Explosion (2)_32: 558017206
+      Explosion (2)_33: -2012241958
+      Explosion (2)_34: 1054282860
+      Explosion (2)_35: 2000736128
+      Explosion (2)_36: 1273769674
+      Explosion (2)_37: -1246058775
+      Explosion (2)_38: 1060058141
+      Explosion (2)_39: -1885424081
+      Explosion (2)_4: 1384445110
+      Explosion (2)_40: 1623888369
+      Explosion (2)_41: -1262619036
+      Explosion (2)_42: -1033300280
+      Explosion (2)_43: -667643323
+      Explosion (2)_44: 1339443923
+      Explosion (2)_45: 1625327687
+      Explosion (2)_46: 583384719
+      Explosion (2)_47: -1700328873
+      Explosion (2)_48: 879423219
+      Explosion (2)_49: -1037058027
+      Explosion (2)_5: 2014596772
+      Explosion (2)_50: -17646014
+      Explosion (2)_51: 626626726
+      Explosion (2)_52: -1169975175
+      Explosion (2)_53: 1445083733
+      Explosion (2)_54: -369584226
+      Explosion (2)_55: -228556976
+      Explosion (2)_56: 1860360068
+      Explosion (2)_57: 560042058
+      Explosion (2)_58: -1713238283
+      Explosion (2)_59: -1483575836
+      Explosion (2)_6: 68629245
+      Explosion (2)_60: -1894593334
+      Explosion (2)_61: 1589818748
+      Explosion (2)_62: -1305393269
+      Explosion (2)_63: 808537368
+      Explosion (2)_64: 322988713
+      Explosion (2)_65: -1837650057
+      Explosion (2)_66: 1290782336
+      Explosion (2)_67: -475201666
+      Explosion (2)_68: 1533540133
+      Explosion (2)_69: 804840419
+      Explosion (2)_7: -799391508
+      Explosion (2)_70: -1823316214
+      Explosion (2)_71: -1945747572
+      Explosion (2)_72: 919568220
+      Explosion (2)_73: -2021152118
+      Explosion (2)_74: 652319209
+      Explosion (2)_75: -900632932
+      Explosion (2)_76: -1701434884
+      Explosion (2)_77: 374499936
+      Explosion (2)_78: -1660488589
+      Explosion (2)_79: -705566652
+      Explosion (2)_8: -872105644
+      Explosion (2)_80: -610688271
+      Explosion (2)_81: 663852824
+      Explosion (2)_82: 1392735418
+      Explosion (2)_83: -1850654638
+      Explosion (2)_84: 852373350
+      Explosion (2)_85: -98054922
+      Explosion (2)_86: -515133366
+      Explosion (2)_87: 615414744
+      Explosion (2)_88: 426939184
+      Explosion (2)_89: -1642108319
+      Explosion (2)_9: -1376831141
+      Explosion (2)_90: 949154415
+      Explosion (2)_91: -161525108
+      Explosion (2)_92: -765714645
+      Explosion (2)_93: 1674177300
+      Explosion (2)_94: 328521694
+      Explosion (2)_95: -1230440236
+      Explosion (2)_96: -1682968937
+      Explosion (2)_97: -1346373405
+      Explosion (2)_98: -1024624489
+      Explosion (2)_99: -2073455229
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

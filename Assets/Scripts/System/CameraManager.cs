@@ -13,11 +13,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] internal enum eGround { under, mid };
     [SerializeField] internal eGround ground;
     [SerializeField] internal float camPos;
-    void Start()
-    {
-        // camPos =;
-        // Debug.Log(camPos);
-    }
+    [SerializeField] internal float startX;
     private void FixedUpdate()
     {
         if (player.position.x >= bossDoorFornt.x && player.position.y > bossDoorFornt.y && player.position.y < bossDoorFornt.y + 3 && !GameManager.instance.bossAppear)
@@ -44,13 +40,13 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
                     }
-                    else if (player.position.x > -5.0f)
+                    else if (player.position.x > startX)
                     {
                         targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(-5.0f, player.position.y, this.transform.position.z);
+                        targetPos = new Vector3(startX, player.position.y, this.transform.position.z);
                     }
                     transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
                 }
@@ -62,13 +58,13 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(bossDoorFornt.x, player.position.y + 2.2f, this.transform.position.z);
                     }
-                    else if (player.position.x > -5.0f)
+                    else if (player.position.x > startX)
                     {
                         targetPos = new Vector3(player.position.x, player.position.y + 2.2f, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(-5.0f, player.position.y + 2.2f, this.transform.position.z);
+                        targetPos = new Vector3(startX, player.position.y + 2.2f, this.transform.position.z);
                     }
                     transform.position = targetPos;
                 }
@@ -79,13 +75,13 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(bossDoorFornt.x, camPos, this.transform.position.z);
                     }
-                    else if (player.position.x > -5.0f)
+                    else if (player.position.x > startX)
                     {
                         targetPos = new Vector3(player.position.x, camPos, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(-5.0f, camPos, this.transform.position.z);
+                        targetPos = new Vector3(startX, camPos, this.transform.position.z);
                     }
                     transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
                 }
@@ -96,13 +92,13 @@ public class CameraManager : MonoBehaviour
                 {
                     targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
                 }
-                else if (player.position.x > -5.0f)
+                else if (player.position.x > startX)
                 {
                     targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
                 }
                 else
                 {
-                    targetPos = new Vector3(-5.0f, player.position.y, this.transform.position.z);
+                    targetPos = new Vector3(startX, player.position.y, this.transform.position.z);
                 }
                 transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
             }

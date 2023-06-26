@@ -13,6 +13,8 @@ TagManager:
   - BottomGround
   - MidGround
   - Boss
+  - Button
+  - GetItem
   layers:
   - Default
   - TransparentFX
@@ -31,9 +33,9 @@ TagManager:
   - Shield
   - Wall
   - Ground
-  - 
-  - 
-  - 
+  - Boss
+  - Gas
+  - LandMineButton
   - 
   - 
   - 

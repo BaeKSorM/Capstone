@@ -33,7 +33,6 @@ public class UIManager : MonoBehaviour
     public IEnumerator loading()
     {
         Debug.Log("be");
-        PlayerController.instance.isCinematic = true;
         FadeInOut.instance.inOrOut = FadeInOut.InOrOut.Out;
         yield return new WaitUntil(() => FadeInOut.instance.fOut);
         Debug.Log("en");
