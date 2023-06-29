@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
@@ -28,8 +29,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] internal enum eAge { 로마, 현대, 미래 };
     [SerializeField] internal eAge age;
-    [SerializeField] internal int saveAge;
-
+    [SerializeField] public bool SM;
 
     [Tooltip("보스 등장했는지")]
     [SerializeField] internal bool bossAppear;
@@ -37,15 +37,21 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
         // 첫스테이지
-        PlayerPrefs.SetInt("SaveLevel", 0);
+        //UIManager.instance.
+        // PlayerPrefs.SetInt("SaveLevel", 0);
         PlayerPrefs.SetFloat("PlayerHp", 100);
-        PlayerPrefs.SetInt("age", saveAge);
         // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
+        age = (eAge)PlayerPrefs.GetInt("SaveLevel");
     }
     void Start()
     {
-        age = (eAge)PlayerPrefs.GetInt("age");
-        PlayerController.instance.hpbar.value = PlayerPrefs.GetFloat("PlayerHp");
+        if (SM)
+        {
+            SoundManager.instance.audioMixer.SetFloat("Volume", PlayerPrefs.GetFloat("Volume"));
+            SoundManager.instance.audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("Music"));
+            SoundManager.instance.audioMixer.SetFloat("SoundEffect", PlayerPrefs.GetFloat("SFX"));
+        }
+        // PlayerController.instance.hpbar.value = PlayerPrefs.GetFloat("PlayerHp");
         for (int i = 0; i < dropEnemiesMaxCount; ++i)
         {
             int rand = Random.Range(0, enemies.Count);
@@ -61,12 +67,12 @@ public class GameManager : MonoBehaviour
     }
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && SM)
         {
-            Application.Quit();
+            UIManager.instance.Pause();
         }
     }
+
     internal void show_ItemInfo(int nearby_Item)
     {
         if (beforeSteped != -1 && nearby_Item != beforeSteped)

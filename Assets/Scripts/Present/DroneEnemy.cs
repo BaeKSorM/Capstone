@@ -17,15 +17,6 @@ public class DroneEnemy : Creature
     }
     IEnumerator OnTriggerEnter2D(Collider2D other)
     {
-        // if (other.CompareTag("Player"))
-        // {
-        //     damage = saveDamage;
-        //     Debug.Log(damage);
-        // }
-        // else
-        // {
-        //     damage = 0;
-        // }
         if (other.CompareTag("AttackSight") && !isDamaged)
         {
             inside = true;

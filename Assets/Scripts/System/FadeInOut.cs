@@ -17,6 +17,13 @@ public class FadeInOut : MonoBehaviour
     {
         instance = this;
     }
+    void Start()
+    {
+        if (inOrOut == InOrOut.Default)
+        {
+            inOrOut = InOrOut.In;
+        }
+    }
     void Update()
     {
         switch (inOrOut)

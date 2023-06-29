@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal int weaponCount;
     [SerializeField] internal bool isTouching;
     [SerializeField] internal bool dyspnoea;
+    [SerializeField] internal bool oscillation;
     [SerializeField] internal float reduceDamage;
     [SerializeField] internal GameObject fadeCan;
     [SerializeField] internal GameObject bossHpbar;
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask mask;
     [SerializeField] private float dis;
     [SerializeField] internal float reduce;
+    [SerializeField] internal string[] keys;
     FadeInOut fadeInOut;
     CameraManager cameraManager;
     void Awake()
@@ -71,15 +73,15 @@ public class PlayerController : MonoBehaviour
             if (!anim.GetBool("isAttack"))
             {
                 ViewDirection();
-                if (Input.GetKeyDown(KeyCode.Z))
+                if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[5])))
                 {
                     StartCoroutine(Attack());
                 }
-                if (Input.GetKeyDown(KeyCode.S) && weaponNames[1] != "")
+                if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[7])) && weaponNames[1] != "")
                 {
                     swapWeapons();
                 }
-                if (Input.GetKeyDown(KeyCode.F))
+                if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[4])))
                 {
                     if (ReadyForBoss.instance.ready && GameManager.instance.deadCount == GameManager.instance.enemies.Count)
                     {
@@ -160,7 +162,8 @@ public class PlayerController : MonoBehaviour
     }
     private void Move()
     {
-        playerRB.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, playerRB.velocity.y);
+        float hori = Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[2])) ? 1 : Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[3])) ? -1 : 0;
+        playerRB.velocity = new Vector2(hori * moveSpeed, playerRB.velocity.y);
         if (playerRB.velocity.x != 0)
         {
             anim.SetBool("isMove", true);
@@ -226,7 +229,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Jump()
     {
-        if (Input.GetButtonDown("Jump") && jumpCount < maxJumpCount)
+        if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[6])) && jumpCount < maxJumpCount)
         {
             ++jumpCount;
             anim.SetBool("isJump", true);
@@ -279,9 +282,23 @@ public class PlayerController : MonoBehaviour
     {
         if (other.name.Contains("Gas"))
         {
-            if (other.GetComponent<Gas>().isGas && dyspnoea)
+            if (dyspnoea)
             {
                 dyspnoea = false;
+            }
+        }
+        if (other.name.Contains("Agari"))
+        {
+            if (dyspnoea)
+            {
+                dyspnoea = false;
+            }
+        }
+        if (other.name.Contains("Wave"))
+        {
+            if (oscillation)
+            {
+                oscillation = false;
             }
         }
     }
@@ -376,14 +393,62 @@ public class PlayerController : MonoBehaviour
                     hpbar.value -= dDamage;
                 }
             }
-            Debug.Log(3);
+            else if (other.name.Contains("Agari"))
+            {
+                StartCoroutine(AgariDam(other));
+            }
+            else if (other.name.Contains("AIM120B"))
+            {
+                float aDamage = other.GetComponent<AIM120B>().damage;
+                hpbar.value -= aDamage;
+            }
+            else if (other.name.Contains("Boss"))
+            {
+                Debug.Log("boss");
+                if (other.GetComponent<PresentBoss>().skills == PresentBoss.eSkills.맵회전)
+                {
+                    Debug.Log("roll");
+                    float bDamage = other.GetComponent<PresentBoss>().damage;
+                    hpbar.value -= bDamage;
+                }
+            }
+            else if (other.name.Contains("Wave"))
+            {
+                if (other.GetComponent<Wave>().isWave && !oscillation)
+                {
+                    StartCoroutine(WaveDam(other));
+                }
+            }
         }
         if (hpbar.value <= 0)
         {
+            Debug.Log(0);
             PlayerPrefs.SetInt("SaveLevel", 0);
-            SceneManager.LoadScene(1);
+            StartCoroutine(UIManager.instance.loading());
         }
         PlayerPrefs.SetFloat("PlayerHp", hpbar.value);
+    }
+    IEnumerator AgariDam(Collider2D other)
+    {
+        Agaripo agaripo = other.GetComponent<Agaripo>();
+        float aDamage = agaripo.damage;
+        dyspnoea = true;
+        while (dyspnoea)
+        {
+            hpbar.value -= aDamage;
+            yield return new WaitForSeconds(1f);
+        }
+    }
+    IEnumerator WaveDam(Collider2D other)
+    {
+        Wave wave = other.GetComponent<Wave>();
+        float wDamage = wave.damage;
+        oscillation = true;
+        while (oscillation)
+        {
+            hpbar.value -= wDamage;
+            yield return new WaitForSeconds(1f);
+        }
     }
     IEnumerator GDamagePerSecond(Collider2D other)
     {

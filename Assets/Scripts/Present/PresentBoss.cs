@@ -6,10 +6,11 @@ using UnityEngine.UI;
 public class PresentBoss : MonoBehaviour
 {
     public static PresentBoss instance;
-    public enum eSkills { 몹소환, 창찌르기, 회복, 돌진 };
+    public enum eSkills { 맵회전, 아가리포, 미사일, 폭격 };
     public eSkills skills;
     [Tooltip("체력 바")]
     [SerializeField] internal Slider hpbar;
+    [SerializeField] internal float damage;
     [SerializeField] internal Animator anim;
     [SerializeField] internal Transform player;
 
@@ -24,16 +25,25 @@ public class PresentBoss : MonoBehaviour
     [SerializeField] internal bool isAttack;
     [SerializeField] internal bool enterance;
     [SerializeField] internal float dis;
+    [SerializeField] internal Transform[] shotPsoes;
+    [SerializeField] internal GameObject aim120b;
     [SerializeField] internal Transform mouth;
+    [SerializeField] internal Transform source;
     [SerializeField] internal GameObject agari;
+    [SerializeField] internal GameObject wave;
+    [SerializeField] internal int LR;
     [SerializeField] Vector3 bossAppear = new Vector2(23, -1.99f);
+    [SerializeField] internal float launchAngle;
+    [SerializeField] internal float launchSpeed;
+    [SerializeField] internal bool onGround;
     [SerializeField] internal CameraManager cameraManager;
     Rigidbody2D bossRB;
+    BoxCollider2D bossBC;
     void Start()
     {
+        bossBC = GetComponent<BoxCollider2D>();
         bossRB = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        // weapon = transform.GetChild(1).gameObject;
         instance = this;
     }
     void Update()
@@ -52,7 +62,7 @@ public class PresentBoss : MonoBehaviour
         }
         if (other.CompareTag("Player"))
         {
-            if (other.transform.Find("Shield").gameObject.activeSelf)
+            if (other.transform.Find("Shield") != null && other.transform.Find("Shield").gameObject.activeSelf)
             {
                 if (Mathf.Abs(transform.position.x - other.transform.position.x) > Mathf.Abs(transform.position.x - other.transform.Find("Shield").position.x) ? true : false)
                 {
@@ -61,16 +71,23 @@ public class PresentBoss : MonoBehaviour
             }
         }
     }
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("BottomGround"))
+        {
+            onGround = true;
+        }
+    }
     IEnumerator UseSkills()
     {
         while (hpbar.value > 0)
         {
             if (!PlayerController.instance.isCinematic)
             {
-                int LR = transform.position.x > player.position.x ? 1 : -1;
+                LR = transform.position.x > player.position.x ? 1 : -1;
                 skillEnd = false;
                 // 확률도 조정해야함
-                switch (Random.Range(1, 1))
+                switch (Random.Range(2, 2))
                 {
                     case 0:
                         StartCoroutine(RollMap());
@@ -79,8 +96,10 @@ public class PresentBoss : MonoBehaviour
                         StartCoroutine(Agaripo());
                         break;
                     case 2:
+                        StartCoroutine(AIM120B());
                         break;
                     case 3:
+                        StartCoroutine(SoaringSlam());
                         break;
                 }
                 yield return new WaitUntil(() => skillEnd);
@@ -93,7 +112,7 @@ public class PresentBoss : MonoBehaviour
     }
     internal IEnumerator BossAppear()
     {
-        Physics2D.IgnoreLayerCollision(15, 8, true);
+        // Physics2D.IgnoreLayerCollision(15, 8, true);
         yield return new WaitForSeconds(0.2f);
         // while (transform.position != bossAppear)
         // {
@@ -105,7 +124,12 @@ public class PresentBoss : MonoBehaviour
     [SerializeField] internal LayerMask wgMask;
     IEnumerator RollMap()
     {
-        bossRB.bodyType = RigidbodyType2D.Kinematic;
+        skills = eSkills.맵회전;
+        int layerNumber = LayerMask.NameToLayer("EnemyWeapon");
+        gameObject.layer = layerNumber;
+        gameObject.tag = "EnemyWeapon";
+        bossRB.bodyType = RigidbodyType2D.Static;
+        bossBC.isTrigger = true;
         int LR = transform.position.x > player.position.x ? 1 : -1;
         transform.localScale = new Vector2(LR, 1);
         RaycastHit2D hit;
@@ -114,43 +138,45 @@ public class PresentBoss : MonoBehaviour
         while (!hit)
         {
             hit = Physics2D.Raycast(transform.position, Vector2.left * LR, dis, wgMask);
-            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.left * LR, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.left * LR, 0.1f);
             yield return null;
         }
-        Debug.Log(Vector2.up);
         hit = Physics2D.Raycast(transform.position, Vector2.up, dis, wgMask);
         while (!hit)
         {
             hit = Physics2D.Raycast(transform.position, Vector2.up, dis, wgMask);
-            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.up, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.up, 0.1f);
             yield return null;
         }
-        Debug.Log(Vector2.up);
         hit = Physics2D.Raycast(transform.position, Vector2.left * -LR, dis, wgMask);
         while (!hit)
         {
             hit = Physics2D.Raycast(transform.position, Vector2.left * -LR, dis, wgMask);
-            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.left * -LR, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.left * -LR, 0.1f);
             yield return null;
-            Debug.Log(Vector2.up);
         }
         hit = Physics2D.Raycast(transform.position, Vector2.down, dis, wgMask);
         while (!hit)
         {
             hit = Physics2D.Raycast(transform.position, Vector2.down, dis, wgMask);
-            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.down, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, transform.position + Vector3.down, 0.1f);
             yield return null;
         }
         while (transform.position.x != curPos.x)
         {
-            transform.position = Vector2.MoveTowards(transform.position, curPos, 0.01f);
+            transform.position = Vector2.MoveTowards(transform.position, curPos, 0.1f);
             yield return null;
         }
+        layerNumber = LayerMask.NameToLayer("Enemy");
+        gameObject.layer = layerNumber;
+        gameObject.tag = "Enemy";
         bossRB.bodyType = RigidbodyType2D.Dynamic;
+        bossBC.isTrigger = false;
         skillEnd = true;
     }
     IEnumerator Agaripo()
     {
+        skills = eSkills.아가리포;
         Vector3 playerPos = player.position;
         GameObject agaripo = Instantiate(agari, mouth.position, Quaternion.identity);
         Vector3 direction = (playerPos - agaripo.transform.position).normalized;
@@ -159,5 +185,35 @@ public class PresentBoss : MonoBehaviour
             agaripo.transform.position += direction * speed * Time.deltaTime;
             yield return null;
         }
+    }
+    IEnumerator AIM120B()
+    {
+        skills = eSkills.미사일;
+        // LR = player.transform.position.x > transform.position.x ? -1 : 1;
+        // transform.localScale = new Vector2(LR, 1);
+        foreach (Transform shotPos in shotPsoes)
+        {
+            GameObject aim = Instantiate(aim120b, shotPos.position, Quaternion.identity);
+            aim.GetComponent<AIM120B>().LR = player.transform.position.x > transform.position.x ? -1 : 1;
+            aim.GetComponent<AIM120B>().targetPos = shotPos;
+            yield return new WaitForSeconds(0.5f);
+        }
+        yield return new WaitForSeconds(1f);
+        skillEnd = true;
+    }
+    IEnumerator SoaringSlam()
+    {
+        skills = eSkills.폭격;
+        onGround = false;
+        float radianAngle = ((LR * launchAngle) + 90) * Mathf.Deg2Rad;
+        Vector2 launchVelocity = new Vector2(Mathf.Cos(radianAngle), Mathf.Sin(radianAngle)) * launchSpeed;
+        bossRB.velocity = launchVelocity;
+        while (!onGround)
+        {
+            yield return null;
+        }
+        GameObject shockWave = Instantiate(wave, source.position, Quaternion.identity);
+        yield return new WaitForSeconds(0.5f);
+        skillEnd = true;
     }
 }

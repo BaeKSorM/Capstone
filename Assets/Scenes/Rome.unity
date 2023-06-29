@@ -154,8 +154,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startCanvas: {fileID: 0}
   loadingCanvas: {fileID: 1426921208}
+  pause: {fileID: 0}
+  restart: {fileID: 0}
+  control: {fileID: 0}
+  setting: {fileID: 0}
+  exit: {fileID: 0}
   load: 1
+  Buttons: []
   waitTime: 0.1
+  buttonTexts: []
+  buttonImages: []
+  targetResolution: {x: 0, y: 0}
+  mode: 0
+  fadeInOut: {fileID: 576465083}
 --- !u!4 &129149978
 Transform:
   m_ObjectHideFlags: 0
@@ -1890,10 +1901,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4935870444060645109, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
+--- !u!114 &576465083 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2144867653, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
+  m_PrefabInstance: {fileID: 576465082}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426921208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb3c51bf0b351c449c42f1fe26213c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &598194440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5684,6 +5706,7 @@ MonoBehaviour:
   weaponCount: 0
   isTouching: 0
   dyspnoea: 0
+  oscillation: 0
   reduceDamage: 0
   fadeCan: {fileID: 1426921208}
   bossHpbar: {fileID: 1002710785}

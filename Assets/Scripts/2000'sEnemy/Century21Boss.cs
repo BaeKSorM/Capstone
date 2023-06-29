@@ -107,6 +107,7 @@ public class Century21Boss : MonoBehaviour
     }
     IEnumerator ShootCannonball()
     {
+        skills = eSkills.포탄발사;
         GameObject cannonBallClone = Instantiate(cannonBall, shootPos.position, Quaternion.identity);
         cannonBallClone.transform.parent = transform.parent;
         yield return new WaitForSeconds(shootDelay);
@@ -114,6 +115,7 @@ public class Century21Boss : MonoBehaviour
     }
     IEnumerator ThrowGas()
     {
+        skills = eSkills.독가스투척;
         for (int i = 1; i <= throwCount; ++i)
         {
             int randThrow = Random.Range((i - 1) * throwPoses.Length / throwCount, i * throwPoses.Length / throwCount);
@@ -128,6 +130,7 @@ public class Century21Boss : MonoBehaviour
     }
     IEnumerator AerialBomb()
     {
+        skills = eSkills.항공기탑재폭탄;
         for (int i = 1; i <= throwCount; ++i)
         {
             int randThrow = Random.Range((i - 1) * throwPoses.Length / throwCount, i * throwPoses.Length / throwCount);
@@ -142,6 +145,7 @@ public class Century21Boss : MonoBehaviour
     }
     IEnumerator LandMine()
     {
+        skills = eSkills.지뢰투적;
         for (int i = 1; i <= throwCount; ++i)
         {
             int randThrow = Random.Range((i - 1) * throwPoses.Length / throwCount, i * throwPoses.Length / throwCount);

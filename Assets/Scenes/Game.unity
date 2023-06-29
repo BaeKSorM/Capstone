@@ -238,8 +238,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startCanvas: {fileID: 1412554713}
   loadingCanvas: {fileID: 2144867648}
+  pause: {fileID: 0}
+  restart: {fileID: 0}
+  control: {fileID: 0}
+  setting: {fileID: 0}
+  exit: {fileID: 0}
   load: 0
+  Buttons: []
   waitTime: 0.5
+  buttonTexts: []
+  buttonImages: []
+  targetResolution: {x: 0, y: 0}
+  mode: 0
+  fadeInOut: {fileID: 2144867649}
 --- !u!4 &704813787
 Transform:
   m_ObjectHideFlags: 0
@@ -777,6 +788,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4935870444060645109, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
   m_PrefabInstance: {fileID: 4935870442059432885}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2144867649 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2144867653, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
+  m_PrefabInstance: {fileID: 4935870442059432885}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144867648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb3c51bf0b351c449c42f1fe26213c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2641355834861265885
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -826,6 +848,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2641355835656201296, guid: c2a2ac1d8d2095943a063cf036ac906d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2641355835656201297, guid: c2a2ac1d8d2095943a063cf036ac906d, type: 3}
+      propertyPath: SM
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2641355835656201297, guid: c2a2ac1d8d2095943a063cf036ac906d, type: 3}
