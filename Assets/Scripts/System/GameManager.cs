@@ -10,8 +10,6 @@ public class GameManager : MonoBehaviour
     [Header("스테이지")]
     [Tooltip("스테이지 이름")]
     [SerializeField] internal List<string> stages;
-    [Tooltip("현재 스테이지")]
-    [SerializeField] internal int saveStageLevel;
     [Tooltip("아이템 드랍할 적 최대수")]
     [SerializeField] internal int dropEnemiesMaxCount;
     [Tooltip("적들넣어주기")]
@@ -38,18 +36,23 @@ public class GameManager : MonoBehaviour
         instance = this;
         // 첫스테이지
         //UIManager.instance.
-        // PlayerPrefs.SetInt("SaveLevel", 0);
         PlayerPrefs.SetFloat("PlayerHp", 100);
         // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
+        //테스트용
+        PlayerPrefs.SetInt("SaveLevel", 0);
         age = (eAge)PlayerPrefs.GetInt("SaveLevel");
+        Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
     }
     void Start()
     {
         if (SM)
         {
-            SoundManager.instance.audioMixer.SetFloat("Volume", PlayerPrefs.GetFloat("Volume"));
-            SoundManager.instance.audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("Music"));
-            SoundManager.instance.audioMixer.SetFloat("SoundEffect", PlayerPrefs.GetFloat("SFX"));
+            Screen.SetResolution(PlayerPrefs.GetInt("ScreenWidth"), PlayerPrefs.GetInt("ScreenHeight"), (FullScreenMode)System.Enum.Parse(typeof(FullScreenMode), PlayerPrefs.GetString("mode"), true));
+            {
+                SoundManager.instance.audioMixer.SetFloat("Volume", PlayerPrefs.GetFloat("Volume"));
+                SoundManager.instance.audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("Music"));
+                SoundManager.instance.audioMixer.SetFloat("SoundEffect", PlayerPrefs.GetFloat("SFX"));
+            }
         }
         // PlayerController.instance.hpbar.value = PlayerPrefs.GetFloat("PlayerHp");
         for (int i = 0; i < dropEnemiesMaxCount; ++i)
@@ -92,14 +95,14 @@ public class GameManager : MonoBehaviour
     /// 스테이지 불러오기
     /// </summary>
     /// <param name="_stageLevel">이동할 스테이지</param>
-    public void stageStart(int _stageLevel)
+    public void stageStart()
     {
-        saveStageLevel = _stageLevel;
-        SceneManager.LoadScene(stages[_stageLevel]);
+        SceneManager.LoadScene(stages[PlayerPrefs.GetInt("SaveLevel")]);
     }
     public void GameClear()
     {
-        PlayerPrefs.SetInt("SaveLevel", ++saveStageLevel);
+        PlayerPrefs.SetInt("SaveLevel", PlayerPrefs.GetInt("SaveLevel") + 1);
+        Debug.Log("GameClear");
 #if UNITY_EDITOR
         // UnityEditor.EditorApplication.isPlaying = false;
 #endif

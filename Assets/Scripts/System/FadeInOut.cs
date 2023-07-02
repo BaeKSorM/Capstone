@@ -12,17 +12,17 @@ public class FadeInOut : MonoBehaviour
     [SerializeField] internal enum InOrOut { In, Out, Default };
     [SerializeField] internal InOrOut inOrOut;
     [SerializeField] internal Image background;
-    internal bool fOut;
+    [SerializeField] internal bool fOut;
+    [SerializeField] internal bool fIn;
     private void Awake()
     {
         instance = this;
+        inOrOut = InOrOut.In;
     }
     void Start()
     {
-        if (inOrOut == InOrOut.Default)
-        {
-            inOrOut = InOrOut.In;
-        }
+        // inOrOut = InOrOut.In;
+        // Debug.Log("Start");
     }
     void Update()
     {
@@ -43,13 +43,18 @@ public class FadeInOut : MonoBehaviour
     // 밝아지기
     public IEnumerator FadeInCor(float fadeTime)
     {
+        Debug.Log("inin");
+        Time.timeScale = 1;
         while (background.color.a > 0)
         {
+            Debug.Log("iniing");
             background.color -= new Color(0, 0, 0, 1 / (fadeTime * 100));
             yield return new WaitForSeconds(0.01f);
         }
+        Debug.Log("inend");
         // 인 시간
         // Debug.Log(ff);
+        fIn = true;
     }
     // 어두워지기
     public IEnumerator FadeOutCor(float fadeTime)

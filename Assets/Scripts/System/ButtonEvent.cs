@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 public class ButtonEvent : MonoBehaviour
 {
     Button button;
@@ -18,25 +19,40 @@ public class ButtonEvent : MonoBehaviour
     [SerializeField] internal Image image;
     [SerializeField] internal GameObject keyPanel;
     [SerializeField] internal string keyPressed;
+    RectTransform keyRect;
+    float spriteWidth;
+    float spriteHeight;
+    float spriteRatio;
+    float height;
+    float width;
+    [SerializeField] bool once;
     void Awake()
     {
+        // spriteRenderer = transform.Find("Key").GetComponent<SpriteRenderer>();
         button = GetComponent<Button>();
         if (resolusion)
         {
             selected.text = PlayerPrefs.GetString("Resolution");
         }
-        if (screen)
+        else if (screen)
         {
             selected.text = PlayerPrefs.GetString("Screen");
         }
-        if (control)
+        else if (control)
         {
             Sprite[] sprites = Resources.LoadAll<Sprite>("Images");
             foreach (Sprite sprite in sprites)
             {
                 if (sprite.name == PlayerPrefs.GetString(gameObject.name))
                 {
+                    keyRect = transform.Find("Key").GetComponent<RectTransform>();
                     image.sprite = sprite;
+                    spriteWidth = sprite.bounds.size.x;
+                    spriteHeight = sprite.bounds.size.y;
+                    spriteRatio = spriteWidth / spriteHeight;
+                    height = keyRect.rect.height;
+                    width = height * spriteRatio;
+                    keyRect.sizeDelta = new Vector2(width, height);
                 }
             }
         }
@@ -52,11 +68,11 @@ public class ButtonEvent : MonoBehaviour
         buttonImages = GetComponentsInChildren<Image>(false);
         foreach (TMP_Text text in buttonTexts)
         {
-            text.color = new Color(0, 0, 0, 255);
+            text.color = new Color(0.3f, 0.5f, 0.8f, 1);
         }
         foreach (Image image in buttonImages)
         {
-            image.color = new Color(0, 0, 0, 255);
+            image.color = new Color(0.3f, 0.5f, 0.8f, 1);
         }
     }
     public void PointerUp()
@@ -65,11 +81,11 @@ public class ButtonEvent : MonoBehaviour
         buttonImages = GetComponentsInChildren<Image>(false);
         foreach (TMP_Text text in buttonTexts)
         {
-            text.color = new Color(255, 255, 255, 255);
+            text.color = new Color(1, 1, 1, 1);
         }
         foreach (Image image in buttonImages)
         {
-            image.color = new Color(255, 255, 255, 255);
+            image.color = new Color(1, 1, 1, 1);
         }
     }
     public void Next()
@@ -94,19 +110,16 @@ public class ButtonEvent : MonoBehaviour
         {
             if (selected.text == collections[0])
             {
-                PlayerPrefs.SetString("Screen", selected.text);
                 UIManager.instance.mode = FullScreenMode.FullScreenWindow;
                 return;
             }
             if (selected.text == collections[1])
             {
-                PlayerPrefs.SetString("Screen", selected.text);
                 UIManager.instance.mode = FullScreenMode.ExclusiveFullScreen;
                 return;
             }
             if (selected.text == collections[2])
             {
-                PlayerPrefs.SetString("Screen", selected.text);
                 UIManager.instance.mode = FullScreenMode.Windowed;
                 return;
             }
@@ -157,8 +170,10 @@ public class ButtonEvent : MonoBehaviour
     {
         if (changeKey)
         {
-            if (Input.anyKeyDown)
+            if (Input.anyKeyDown && IsExceptionKey() && !once)
             {
+                once = true;
+                Debug.Log(1);
                 keyPressed = GetKeyPressed().ToString();
                 Debug.Log(keyPressed);
                 Sprite[] sprites = Resources.LoadAll<Sprite>("Images");
@@ -166,18 +181,82 @@ public class ButtonEvent : MonoBehaviour
                 {
                     if (sprite.name == keyPressed)
                     {
+                        List<Button> keyPads = UIManager.instance.keyPads;
+                        for (int i = 0; i < keyPads.Count; ++i)
+                        {
+                            if (keyPads[i].transform.Find("Key").GetComponent<Image>().sprite == sprite)
+                            {
+                                keyPads[i].transform.Find("Key").GetComponent<Image>().sprite = image.sprite;
+                                Sprite keySprite = keyPads[i].transform.Find("Key").GetComponent<Image>().sprite;
+                                keyRect = keyPads[i].transform.Find("Key").GetComponent<RectTransform>();
+                                spriteWidth = keySprite.bounds.size.x;
+                                spriteHeight = keySprite.bounds.size.y;
+                                spriteRatio = spriteWidth / spriteHeight;
+                                height = keyRect.rect.height;
+                                width = height * spriteRatio;
+                                keyRect.sizeDelta = new Vector2(width, height);
+                                PlayerController.instance.keys[i] = image.sprite.name;
+                                Debug.Log("changekey");
+                                UIManager.instance.eventButton = button;
+                                break;
+                            }
+                        }
+                        keyRect = transform.Find("Key").GetComponent<RectTransform>();
                         image.sprite = sprite;
+                        spriteWidth = sprite.bounds.size.x;
+                        spriteHeight = sprite.bounds.size.y;
+                        spriteRatio = spriteWidth / spriteHeight;
+                        height = keyRect.rect.height;
+                        width = height * spriteRatio;
+                        keyRect.sizeDelta = new Vector2(width, height);
+                        image.sprite = sprite;
+                        PlayerController.instance.keys[UIManager.instance.count - 12] = keyPressed;
                         break;
                     }
                 }
-                changeKey = false;
                 keyPanel.SetActive(false);
+                StartCoroutine(ChangeWaiting());
             }
         }
+    }
+
+    IEnumerator ChangeWaiting()
+    {
+        float c = 0;
+        while (c < 1f)
+        {
+            c += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        once = false;
+        changeKey = false;
+    }
+    bool IsExceptionKey()
+    {
+
+        foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
+        {
+
+            if (Input.GetKeyDown(keyCode))
+            {
+                KeyCode pressedKey = keyCode;
+                Debug.Log(pressedKey);
+                foreach (KeyCode exceptionKey in UIManager.instance.exceptionKeys)
+                {
+                    if (pressedKey == exceptionKey)
+                    {
+                        Debug.Log(true);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     public void ChangeKey()
     {
         keyPanel.SetActive(true);
+        Debug.Log("on");
         changeKey = true;
     }
     KeyCode GetKeyPressed()

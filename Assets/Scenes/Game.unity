@@ -241,6 +241,7 @@ MonoBehaviour:
   pause: {fileID: 0}
   restart: {fileID: 0}
   control: {fileID: 0}
+  keyPanel: {fileID: 0}
   setting: {fileID: 0}
   exit: {fileID: 0}
   load: 0
@@ -251,6 +252,12 @@ MonoBehaviour:
   targetResolution: {x: 0, y: 0}
   mode: 0
   fadeInOut: {fileID: 2144867649}
+  keyPads: []
+  resetKeys: []
+  count: 0
+  wait: 0
+  eventButton: {fileID: 0}
+  exceptionKeys: 
 --- !u!4 &704813787
 Transform:
   m_ObjectHideFlags: 0
@@ -866,6 +873,10 @@ PrefabInstance:
       propertyPath: stages.Array.data[1]
       value: 2000's
       objectReference: {fileID: 0}
+    - target: {fileID: 2641355835656201297, guid: c2a2ac1d8d2095943a063cf036ac906d, type: 3}
+      propertyPath: stages.Array.data[2]
+      value: Present
+      objectReference: {fileID: 0}
     - target: {fileID: 2641355835656201302, guid: c2a2ac1d8d2095943a063cf036ac906d, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -879,13 +890,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2144867653, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
+      propertyPath: inOrOut
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4935870442957902870, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4935870443073401675, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
       propertyPath: m_Color.a
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4935870443222456022, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
       propertyPath: m_IsActive
@@ -981,7 +996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4935870444060645109, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b09ebc1ede0bab6458ab523f950ce86a, type: 3}

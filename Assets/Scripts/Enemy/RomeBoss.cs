@@ -108,8 +108,8 @@ public class RomeBoss : MonoBehaviour
                         // Debug.Log(3);
                         break;
                     case 3:
-                        StartCoroutine(Crushing(LR));
                         // Debug.Log(4);
+                        StartCoroutine(Crushing(LR));
                         break;
                 }
                 yield return new WaitUntil(() => skillEnd);
@@ -184,9 +184,10 @@ public class RomeBoss : MonoBehaviour
         //공격하고 다시 false로 바뀜
         isAttack = true;
         anim.SetBool("isAttack", true);
-        yield return new WaitForSeconds(1.85f);
-        Debug.Log(anim.GetCurrentAnimatorClipInfo(0).Length);
+        weapon.SetActive(true);
+        yield return new WaitForSeconds(2.06f);
         anim.SetBool("isAttack", false);
+        weapon.SetActive(false);
         yield return new WaitForSeconds(1.0f);
         skillEnd = true;
         isAttack = false;
@@ -215,16 +216,16 @@ public class RomeBoss : MonoBehaviour
     {
         Vector3 curPos = transform.position;
         arrivePos = new Vector2(cameraManager.bossGroundCenter.x - LR * 10, transform.position.y);
-        // Debug.Log(curPos);
-        transform.localScale = new Vector2(LR, 1);
+        Debug.Log(arrivePos);
         weapon.SetActive(true);
+        transform.localScale = new Vector2(LR, 1);
         anim.SetBool("isCrushing", true);
         do
         {
             transform.position = Vector2.MoveTowards(transform.position, arrivePos, 0.02f);
             // 왼쪽으로 이동할때 왼쪽벽 위치보다 왼쪽으로 가면 오른쪽으로 이동
             // 왼쪽으로 가려면 -1 오른쪽에 있으면 1
-            if (cameraManager.bossGroundCenter.x + -LR * 10 == transform.position.x)
+            if (Mathf.Approximately(cameraManager.bossGroundCenter.x - LR * 10, transform.position.x))
             {
                 //수정
                 // Debug.Log("fixed");
@@ -233,8 +234,8 @@ public class RomeBoss : MonoBehaviour
             }
             yield return null;
         } while (transform.position.x != curPos.x);
-        anim.SetBool("isCrushing", false);
         weapon.SetActive(false);
+        anim.SetBool("isCrushing", false);
         yield return new WaitForSeconds(1.0f);
         skillEnd = true;
     }

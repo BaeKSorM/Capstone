@@ -15,10 +15,10 @@ EditorBuildSettings:
     path: Assets/Scenes/2000's.unity
     guid: 67ea138a0178a14479705d924c038469
   - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 1
     path: Assets/Scenes/Test.unity
     guid: 9b8cd3ec7ed4dbd4c8d47766b00aaa49
+  - enabled: 1
+    path: Assets/Scenes/Present.unity
+    guid: 543bcbe408206224d8c913d22d521532
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 50c9d9cde6c8b4842aab60c4f64190b6, type: 2}

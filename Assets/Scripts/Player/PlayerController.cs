@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dis;
     [SerializeField] internal float reduce;
     [SerializeField] internal string[] keys;
+    [SerializeField] internal Image[] itemIcons;
     FadeInOut fadeInOut;
     CameraManager cameraManager;
     void Awake()
@@ -54,11 +55,16 @@ public class PlayerController : MonoBehaviour
     }
     private IEnumerator Start()
     {
-        time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         playerRB = GetComponent<Rigidbody2D>();
         fadeInOut = fadeCan.GetComponent<FadeInOut>();
         cameraManager = mainCam.GetComponent<CameraManager>();
         anim = GetComponent<Animator>();
+        itemIcons[0].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[0]);
+        for (int i = 0; i < keys.Length; ++i)
+        {
+
+        }
+        time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         if (isCinematic)
         {
             yield return new WaitForSeconds(fadeInOut.fadeTime);
@@ -162,7 +168,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Move()
     {
-        float hori = Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[2])) ? 1 : Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[3])) ? -1 : 0;
+        float hori = Input.GetKey((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[2])) ? -1 : Input.GetKey((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[3])) ? 1 : 0;
         playerRB.velocity = new Vector2(hori * moveSpeed, playerRB.velocity.y);
         if (playerRB.velocity.x != 0)
         {
@@ -185,6 +191,8 @@ public class PlayerController : MonoBehaviour
         anim.SetBool(weaponAnimName, false);
         weaponAnimName = "use" + weaponNames[0];
         anim.SetBool(weaponAnimName, true);
+        itemIcons[0].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[0]);
+        itemIcons[1].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[1]);
     }
     private void getWeapon()
     {
@@ -226,6 +234,8 @@ public class PlayerController : MonoBehaviour
         }
         time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         Debug.Log(transform.Find(weaponNames[0]).gameObject.name);
+        itemIcons[0].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[0]);
+        itemIcons[1].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[1]);
     }
     private void Jump()
     {
@@ -255,7 +265,6 @@ public class PlayerController : MonoBehaviour
     void checkGround()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, dis, mask);
-
         if (hit)
         {
             cameraManager.camPos = transform.position.y + 1.5f - dis;//원래2.3
@@ -424,6 +433,7 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log(0);
             PlayerPrefs.SetInt("SaveLevel", 0);
+            Debug.Log("hp0");
             StartCoroutine(UIManager.instance.loading());
         }
         PlayerPrefs.SetFloat("PlayerHp", hpbar.value);
