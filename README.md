@@ -24,5 +24,4 @@
     * 첫 팀프로젝트를 하는 개개인에게 있어서 각각의 능력 향상에 도움이 될 것.
 
 
-# Hits
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fgjbae1212%2Fhit-counter)](https://hits.seeyoufarm.com)                    
