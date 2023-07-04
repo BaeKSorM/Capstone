@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using UnityEngine.Audio;
+using UnityEngine.UI;
+using UnityEngine;
 using TMPro;
 public class GameManager : MonoBehaviour
 {
@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour
 
     [Tooltip("보스 등장했는지")]
     [SerializeField] internal bool bossAppear;
+    [SerializeField] internal AudioSource audioSource;
+    [SerializeField] internal AudioClip[] audioClips;
+
     private void Awake()
     {
         instance = this;
@@ -39,12 +42,28 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetFloat("PlayerHp", 100);
         // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
         //테스트용
-        PlayerPrefs.SetInt("SaveLevel", 0);
+        PlayerPrefs.SetInt("SaveLevel", 2);
         age = (eAge)PlayerPrefs.GetInt("SaveLevel");
-        Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
+        // Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
     }
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+        audioClips = Resources.LoadAll<AudioClip>("AudioClips");
+        Texture2D[] cursors = Resources.LoadAll<Texture2D>("Cursors");
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Images");
+        Debug.Log(sprites.Length);
+        Debug.Log(cursors.Length);
+        foreach (Texture2D cursor in cursors)
+        {
+            if (cursor.name == stages[PlayerPrefs.GetInt("SaveLevel")] + "Cursor")
+            {
+                Cursor.SetCursor(cursor, Vector2.zero, CursorMode.ForceSoftware);
+                Debug.Log("found");
+                break;
+            }
+            Debug.Log(cursor.name);
+        }
         if (SM)
         {
             Screen.SetResolution(PlayerPrefs.GetInt("ScreenWidth"), PlayerPrefs.GetInt("ScreenHeight"), (FullScreenMode)System.Enum.Parse(typeof(FullScreenMode), PlayerPrefs.GetString("mode"), true));
@@ -67,6 +86,16 @@ public class GameManager : MonoBehaviour
                 --i;
             }
         }
+        for (int i = 0; i < audioClips.Length; ++i)
+        {
+            if (audioClips[i].name == stages[PlayerPrefs.GetInt("SaveLevel")] + "Opening")
+            {
+                audioSource.clip = audioClips[i];
+                break;
+            }
+        }
+        Debug.Log(stages[PlayerPrefs.GetInt("SaveLevel")]);
+        audioSource.Play();
     }
     void Update()
     {

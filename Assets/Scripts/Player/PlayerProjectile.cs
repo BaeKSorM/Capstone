@@ -16,9 +16,12 @@ public class PlayerProjectile : PlayerWeapons
         {
             // Destroy(gameObject, PlayerShoot.instance.destroyTime);
         }
-        if (GameManager.instance.age == GameManager.eAge.현대)
+        else
         {
-            targetPos = transform.position + Vector3.right * destroyRange * transform.parent.localScale.x;
+            targetPos = transform.position + Vector3.right * destroyRange * transform.parent.transform.parent.localScale.x;
+            Debug.Log(transform.parent.transform.parent.localScale.x);
+            Debug.Log(transform.parent.transform.parent.name);
+            transform.parent = null;
             while (gameObject != null && gameObject.transform.position != targetPos)
             {
                 gameObject.transform.position = Vector2.MoveTowards(gameObject.transform.position, targetPos, 0.1f);

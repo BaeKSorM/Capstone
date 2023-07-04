@@ -20,10 +20,10 @@ public class EnemyProjectile : MonoBehaviour
         {
             damage = CrossbowEnemy.Instance.attackDamage;
         }
-        // else if (name.Contains("Rifle"))
-        // {
-        //     damage = RifleEnemy.Instance.attackDamage;
-        // }
+        else if (name.Contains("Bullet"))
+        {
+            damage = RifleEnemy.Instance.attackDamage;
+        }
         // else 
         // if (name.Contains("Turret"))
         // {
@@ -59,7 +59,7 @@ public class EnemyProjectile : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             projectileDamage = damage;
-            if (other.transform.Find("Shield").gameObject.activeSelf)
+            if (other.transform.Find("Shield") != null && other.transform.Find("Shield").gameObject.activeSelf)
             {
                 if (Mathf.Abs(transform.position.x - other.transform.position.x) > Mathf.Abs(transform.position.x - other.transform.Find("Shield").position.x) ? true : false)
                 {

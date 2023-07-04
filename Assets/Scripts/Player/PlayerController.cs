@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine;
+using UnityEngine.Audio;
 
 
 public class PlayerController : MonoBehaviour
@@ -47,6 +48,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal float reduce;
     [SerializeField] internal string[] keys;
     [SerializeField] internal Image[] itemIcons;
+    [SerializeField] internal AudioClip[] audioClips;
+    [SerializeField] internal AudioSource audioSource;
     FadeInOut fadeInOut;
     CameraManager cameraManager;
     void Awake()
@@ -55,15 +58,14 @@ public class PlayerController : MonoBehaviour
     }
     private IEnumerator Start()
     {
+        audioSource = GetComponent<AudioSource>();
+        // audioSource.Play();
         playerRB = GetComponent<Rigidbody2D>();
         fadeInOut = fadeCan.GetComponent<FadeInOut>();
         cameraManager = mainCam.GetComponent<CameraManager>();
         anim = GetComponent<Animator>();
+        audioClips = Resources.LoadAll<AudioClip>("AudioClips/");
         itemIcons[0].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[0]);
-        for (int i = 0; i < keys.Length; ++i)
-        {
-
-        }
         time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
         if (isCinematic)
         {
@@ -119,10 +121,18 @@ public class PlayerController : MonoBehaviour
         playerRB.velocity = Vector2.zero;
         anim.SetBool("isAttack", true);
 
+        for (int i = 0; i < audioClips.Length; ++i)
+        {
+            if (audioClips[i].name == weaponNames[0])
+            {
+                audioSource.clip = audioClips[i];
+            }
+        }
+        audioSource.Play();
         reduce = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
-
         transform.Find(weaponNames[0]).gameObject.SetActive(true);
         yield return new WaitForSeconds(time);
+        audioSource.Stop();
         transform.Find(weaponNames[0]).gameObject.SetActive(false);
         transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = 0;
         anim.SetBool("isAttack", false);
@@ -394,7 +404,6 @@ public class PlayerController : MonoBehaviour
             }
             else if (other.name.Contains("Drone"))
             {
-                Debug.Log(1);
                 if (other.GetComponent<DroneEnemy>().bombing)
                 {
                     float dDamage = other.GetComponent<DroneEnemy>().damage;
@@ -427,6 +436,11 @@ public class PlayerController : MonoBehaviour
                 {
                     StartCoroutine(WaveDam(other));
                 }
+            }
+            else if (other.name.Contains("Bullet"))
+            {
+                float bDamage = other.GetComponentInParent<EnemyProjectile>().projectileDamage;
+                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
             }
         }
         if (hpbar.value <= 0)

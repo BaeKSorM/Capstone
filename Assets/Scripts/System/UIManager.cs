@@ -274,7 +274,7 @@ public class UIManager : MonoBehaviour
     {
         fadeInOut.inOrOut = FadeInOut.InOrOut.Out;
         yield return new WaitUntil(() => fadeInOut.fOut);
-        Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
+        // Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
         GameManager.instance.stageStart();
     }
 
@@ -283,20 +283,24 @@ public class UIManager : MonoBehaviour
         if (keyPanel.activeSelf)
         {
             keyPanel.SetActive(false);
+            Debug.Log(1);
         }
         else
         if (restart.activeSelf)
         {
+            Debug.Log(2);
             BrightButtonText(Buttons[0]);
             restart.SetActive(false);
         }
         else if (exit.activeSelf)
         {
+            Debug.Log(3);
             BrightButtonText(Buttons[0]);
             exit.SetActive(false);
         }
         else if (control.activeSelf)
         {
+            Debug.Log(4);
             BrightButtonText(Buttons[0]);
             control.SetActive(false);
             for (int i = 0; i < keyPads.Count; ++i)
@@ -313,6 +317,7 @@ public class UIManager : MonoBehaviour
         }
         else if (setting.activeSelf)
         {
+            Debug.Log(5);
             BrightButtonText(Buttons[0]);
             setting.SetActive(false);
             Time.timeScale = 1;
@@ -325,12 +330,14 @@ public class UIManager : MonoBehaviour
         {
             if (!pause.activeSelf)
             {
+                Debug.Log(6);
                 pause.SetActive(true);
                 Time.timeScale = 0;
                 BrightButtonText(Buttons[0]);
             }
             else if (pause.activeSelf)
             {
+                Debug.Log(7);
                 pause.SetActive(false);
                 Time.timeScale = 1;
             }

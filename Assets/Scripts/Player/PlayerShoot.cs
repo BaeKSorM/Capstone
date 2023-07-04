@@ -22,7 +22,7 @@ public class PlayerShoot : PlayerWeapons
         {
             Bow();
         }
-        else if (GameManager.instance.age == GameManager.eAge.현대)
+        else if (gameObject.name.Contains("Rifle"))
         {
             StartCoroutine(Rifle());
         }
