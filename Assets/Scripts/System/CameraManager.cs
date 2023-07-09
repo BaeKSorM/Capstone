@@ -13,9 +13,13 @@ public class CameraManager : MonoBehaviour
     [SerializeField] internal enum eGround { under, mid };
     [SerializeField] internal eGround ground;
     [SerializeField] internal float camPos;
+    [SerializeField] internal float groundPos;
     [SerializeField] internal float startX;
+    [SerializeField] internal float pPos;
+    [SerializeField] internal float os;
     private void FixedUpdate()
     {
+        os = player.transform.position.y;
         if (player.position.x >= bossDoorFornt.x && player.position.y > bossDoorFornt.y && player.position.y < bossDoorFornt.y + 3 && !GameManager.instance.bossAppear)
         {
             if (player.position.y <= 0)
@@ -26,7 +30,7 @@ public class CameraManager : MonoBehaviour
             {
                 targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
             }
-            transform.position = Vector3.Lerp(transform.position, targetPos, 0.1f);
+            transform.position = Vector3.Lerp(transform.position, targetPos, 0.15f);
         }
         else
         if (!GameManager.instance.bossAppear)
@@ -34,7 +38,7 @@ public class CameraManager : MonoBehaviour
             if (ground == eGround.under)
             {
                 //화면 중간보다 위일때
-                if (player.position.y - 1.0f > camPos)
+                if (player.position.y > camPos)
                 {
                     if (player.position.x >= bossDoorFornt.x)
                     {
@@ -48,25 +52,26 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(startX, player.position.y, this.transform.position.z);
                     }
-                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.15f);
                 }
                 //떨어질때
                 else
-                if (player.position.y < camPos - 2.8)
+                if (player.position.y < groundPos)
                 {
+                    Debug.Log("1234567890");
                     if (player.position.x >= bossDoorFornt.x)
                     {
-                        targetPos = new Vector3(bossDoorFornt.x, player.position.y + 2.2f, this.transform.position.z);
+                        targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);
                     }
                     else if (player.position.x > startX)
                     {
-                        targetPos = new Vector3(player.position.x, player.position.y + 2.2f, this.transform.position.z);
+                        targetPos = new Vector3(player.position.x, player.position.y, this.transform.position.z);
                     }
                     else
                     {
-                        targetPos = new Vector3(startX, player.position.y + 2.2f, this.transform.position.z);
+                        targetPos = new Vector3(startX, player.position.y, this.transform.position.z);
                     }
-                    transform.position = targetPos;
+                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.15f);
                 }
                 //아닐때
                 else
@@ -83,7 +88,7 @@ public class CameraManager : MonoBehaviour
                     {
                         targetPos = new Vector3(startX, camPos, this.transform.position.z);
                     }
-                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+                    transform.position = Vector3.Lerp(transform.position, targetPos, 0.15f);
                 }
             }
             else if (ground == eGround.mid)
@@ -100,7 +105,7 @@ public class CameraManager : MonoBehaviour
                 {
                     targetPos = new Vector3(startX, player.position.y, this.transform.position.z);
                 }
-                transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+                transform.position = Vector3.Lerp(transform.position, targetPos, 0.15f);
             }
         }
         else
@@ -108,7 +113,7 @@ public class CameraManager : MonoBehaviour
         {
             targetPos = bossGroundCenter;
             Camera.main.orthographicSize = 5.0f;
-            transform.position = Vector3.Lerp(transform.position, targetPos, 0.2f);
+            transform.position = Vector3.Lerp(transform.position, targetPos, 0.15f);
         }
     }
 }

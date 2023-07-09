@@ -36,7 +36,6 @@ public class PresentBoss : MonoBehaviour
     [SerializeField] internal float launchAngle;
     [SerializeField] internal float launchSpeed;
     [SerializeField] internal bool onGround;
-    [SerializeField] internal CameraManager cameraManager;
     Rigidbody2D bossRB;
     BoxCollider2D bossBC;
     void Start()
@@ -77,6 +76,8 @@ public class PresentBoss : MonoBehaviour
         {
             onGround = true;
         }
+        Debug.Log(other.gameObject.tag);
+        Debug.Log(other.gameObject.layer);
     }
     IEnumerator UseSkills()
     {
@@ -87,21 +88,26 @@ public class PresentBoss : MonoBehaviour
                 LR = transform.position.x > player.position.x ? 1 : -1;
                 skillEnd = false;
                 // 확률도 조정해야함
-                switch (Random.Range(2, 2))
+                switch (Random.Range(0, 0))
                 {
                     case 0:
+                        Debug.Log(0);
                         StartCoroutine(RollMap());
                         break;
                     case 1:
+                        Debug.Log(1);
                         StartCoroutine(Agaripo());
                         break;
                     case 2:
+                        Debug.Log(2);
                         StartCoroutine(AIM120B());
                         break;
                     case 3:
+                        Debug.Log(3);
                         StartCoroutine(SoaringSlam());
                         break;
                 }
+                Debug.Log("attacked");
                 yield return new WaitUntil(() => skillEnd);
             }
             yield return null;
@@ -132,6 +138,7 @@ public class PresentBoss : MonoBehaviour
         bossBC.isTrigger = true;
         int LR = transform.position.x > player.position.x ? 1 : -1;
         transform.localScale = new Vector2(LR, 1);
+        anim.SetBool("Roll", true);
         RaycastHit2D hit;
         Vector2 curPos = transform.position;
         hit = Physics2D.Raycast(transform.position, Vector2.left * LR, dis, wgMask);

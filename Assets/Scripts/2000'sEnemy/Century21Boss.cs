@@ -66,7 +66,7 @@ public class Century21Boss : MonoBehaviour
     {
         while (hpbar.value > 0)
         {
-            if (!PlayerController.instance.isCinematic)
+            if (!PlayerController.instance.isCinematic && !GameManager.instance.pause)
             {
                 skillEnd = false;
                 // 확률도 조정해야함
@@ -107,6 +107,7 @@ public class Century21Boss : MonoBehaviour
     }
     IEnumerator ShootCannonball()
     {
+        yield return new WaitUntil(() => !GameManager.instance.pause);
         skills = eSkills.포탄발사;
         GameObject cannonBallClone = Instantiate(cannonBall, shootPos.position, Quaternion.identity);
         cannonBallClone.transform.parent = transform.parent;
@@ -118,6 +119,7 @@ public class Century21Boss : MonoBehaviour
         skills = eSkills.독가스투척;
         for (int i = 1; i <= throwCount; ++i)
         {
+            yield return new WaitUntil(() => !GameManager.instance.pause);
             int randThrow = Random.Range((i - 1) * throwPoses.Length / throwCount, i * throwPoses.Length / throwCount);
             GameObject gasClone = Instantiate(gas, gasMinePos);
             Gas gasS = gasClone.GetComponent<Gas>();
@@ -133,6 +135,7 @@ public class Century21Boss : MonoBehaviour
         skills = eSkills.항공기탑재폭탄;
         for (int i = 1; i <= throwCount; ++i)
         {
+            yield return new WaitUntil(() => !GameManager.instance.pause);
             int randThrow = Random.Range((i - 1) * throwPoses.Length / throwCount, i * throwPoses.Length / throwCount);
             GameObject aerialClone = Instantiate(aeriaBomb, aeriaPos);
             AerialBomb aerialBombS = aerialClone.GetComponent<AerialBomb>();
@@ -148,6 +151,7 @@ public class Century21Boss : MonoBehaviour
         skills = eSkills.지뢰투적;
         for (int i = 1; i <= throwCount; ++i)
         {
+            yield return new WaitUntil(() => !GameManager.instance.pause);
             int randThrow = Random.Range((i - 1) * throwPoses.Length / throwCount, i * throwPoses.Length / throwCount);
             GameObject mineClone = Instantiate(landMind, gasMinePos);
             LandMine landMineS = mineClone.GetComponent<LandMine>();

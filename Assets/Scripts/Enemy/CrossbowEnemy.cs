@@ -21,12 +21,13 @@ public class CrossbowEnemy : Creature
     [SerializeField] internal float avoidingTime = 1.0f;
     [SerializeField] internal int LR;
     [SerializeField] internal bool isSpawned;
+    [SerializeField] internal bool isDoing;
     Canvas canvas;
     Rigidbody2D EnemyRB;
     RaycastHit2D[] hit;
     void Start()
     {
-        // speed = 5.0f;
+        speed = 2.0f;
         // range = 7.0f;
         // time = 1.0f;
         // delayTime = 1.0f;
@@ -57,14 +58,17 @@ public class CrossbowEnemy : Creature
     }
     IEnumerator OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("AttackSight") && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
+            isDoing = true;
             // 공격범위에 들어옴;
             while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack && !isAvoiding)
             {
                 // Debug.Log("run");
+                float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
+                transform.localScale = new Vector2(LR, 1f);
                 anim.SetBool("isAttack", false);
-                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), 0.001f);
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
                 yield return null;
             }
             StartCoroutine(Attack(other));
@@ -85,12 +89,16 @@ public class CrossbowEnemy : Creature
     }
     IEnumerator Attack(Collider2D other)
     {
+        isDoing = false;
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack && !isWall)
         {
+            Debug.Log(isAttack);
+            yield return new WaitUntil(() => !GameManager.instance.pause);
             float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
             // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoiding && !isWall)
             {
+                yield return new WaitUntil(() => !GameManager.instance.pause);
                 anim.CrossFade("Crossbow_Run", 0f);
                 transform.localScale = new Vector2(-LR, 1f);
                 isAvoiding = true;

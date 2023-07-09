@@ -6,7 +6,7 @@ public class RifleEnemy : Creature
 {
     public static RifleEnemy Instance;
     [Tooltip("공격 거리")]
-    [SerializeField] internal GameObject arrow;
+    [SerializeField] internal GameObject bullet;
     [SerializeField] internal Transform player;
     [SerializeField] internal Transform enemyHpBar;
     [SerializeField] internal Transform shootPos;
@@ -15,11 +15,12 @@ public class RifleEnemy : Creature
     [SerializeField] internal bool isDamaged;
     [SerializeField] bool isWall;
     [SerializeField] internal int LR;
+    [SerializeField] internal bool isDoing;
     Canvas canvas;
     Rigidbody2D EnemyRB;
     void Start()
     {
-        // speed = 5.0f;
+        speed = 2.0f;
         // range = 7.0f;
         // time = 1.0f;
         // delayTime = 1.0f;
@@ -50,14 +51,18 @@ public class RifleEnemy : Creature
     }
     IEnumerator OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("AttackSight") && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
+            isDoing = true;
             // 공격범위에 들어옴;
-            while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack && !isAvoiding)
+            while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
             {
                 // Debug.Log("run");
+                float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
+                transform.localScale = new Vector2(LR, 1f);
                 anim.SetBool("isAttack", false);
-                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), 0.001f);
+                anim.SetBool("isWalk", true);
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.parent.position.x, transform.position.y), speed * Time.deltaTime);
                 yield return null;
             }
             StartCoroutine(Attack(other));
@@ -78,33 +83,32 @@ public class RifleEnemy : Creature
     }
     IEnumerator Attack(Collider2D other)
     {
-        while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack && !isWall)
+        isDoing = false;
+        int o = 0;
+        Debug.Log(o++);
+        while (!isAttack && Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range)
         {
-            float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
-            // Debug.Log("attack");
             isAttack = true;
-            isAvoiding = true;
-            anim.SetBool("isAttack", true);
-            //공격하고 다시 false로 바뀜
+            Debug.Log(isAttack);
+            yield return new WaitUntil(() => !GameManager.instance.pause);
+            float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
             transform.localScale = new Vector2(LR, 1f);
+            // Debug.Log("attack");
+            anim.SetBool("isWalk", false);
+            //공격하고 다시 false로 바뀜
             yield return new WaitForSeconds(delayTime);
-            GameObject arrowClone = Instantiate(arrow, shootPos.position, Quaternion.identity);
-            arrowClone.transform.parent = transform.parent;
-            EnemyProjectile enemyProjectile = arrowClone.GetComponent<EnemyProjectile>();
-            enemyProjectile.LR = LR;
-            yield return new WaitForSeconds(0.1f);
-            GameObject arrowClone2 = Instantiate(arrow, shootPos.position, Quaternion.identity);
-            arrowClone2.transform.parent = transform.parent;
-            EnemyProjectile enemyProjectile2 = arrowClone2.GetComponent<EnemyProjectile>();
-            enemyProjectile2.LR = LR;
-            yield return new WaitForSeconds(0.1f);
-            GameObject arrowClone3 = Instantiate(arrow, shootPos.position, Quaternion.identity);
-            arrowClone3.transform.parent = transform.parent;
-            EnemyProjectile enemyProjectile3 = arrowClone3.GetComponent<EnemyProjectile>();
-            enemyProjectile3.LR = LR;
+            anim.SetBool("isAttack", true);
+            for (int i = 0; i < 3; ++i)
+            {
+                GameObject bulletClone = Instantiate(bullet, shootPos.position, Quaternion.identity);
+                bulletClone.transform.parent = transform.parent;
+                EnemyProjectile enemyProjectile = bulletClone.GetComponent<EnemyProjectile>();
+                enemyProjectile.LR = LR;
+                yield return new WaitForSeconds(0.1f);
+            }
+            anim.SetBool("isAttack", false);
             yield return new WaitForSeconds(time);
             isAttack = false;
-            isAvoiding = false;
         }
     }
     void Update()

@@ -48,9 +48,16 @@ public class TurretEnemy : Creature
     }
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("AttackSight") && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause)
         {
-            StartCoroutine(Attack(other));
+            if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range)
+            {
+                anim.SetBool("isAttack", false);
+            }
+            else
+            {
+                StartCoroutine(Attack(other));
+            }
         }
     }
     void OnTriggerExit2D(Collider2D other)
@@ -67,8 +74,9 @@ public class TurretEnemy : Creature
     }
     IEnumerator Attack(Collider2D other)
     {
-        while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack && !isWall)
+        while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
+            yield return new WaitUntil(() => !GameManager.instance.pause);
             // Debug.Log("attack");
             isAttack = true;
             anim.SetBool("isAttack", true);

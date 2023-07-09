@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System;
 public class ButtonEvent : MonoBehaviour
 {
+    public static ButtonEvent instance;
     Button button;
     [SerializeField] internal int count = 0;
     [SerializeField] internal string[] collections;
@@ -16,6 +17,8 @@ public class ButtonEvent : MonoBehaviour
     [SerializeField] internal bool screen;
     [SerializeField] internal bool changeKey;
     [SerializeField] internal bool control;
+    [SerializeField] internal bool colorOn;
+    [SerializeField] internal bool buttonText;
     [SerializeField] internal Image image;
     [SerializeField] internal GameObject keyPanel;
     [SerializeField] internal string keyPressed;
@@ -25,9 +28,16 @@ public class ButtonEvent : MonoBehaviour
     float spriteRatio;
     float height;
     float width;
+    [SerializeField] internal Color imageChangeColor;
+    [SerializeField] internal Color imageOriColor;
+    [SerializeField] internal Color textChangeColor;
+    [SerializeField] internal Color textOriColor;
+    [SerializeField] internal Color bTextOriColor;
+    [SerializeField] internal Color bTextChangeColor;
     [SerializeField] bool once;
     void Awake()
     {
+        instance = this;
         // spriteRenderer = transform.Find("Key").GetComponent<SpriteRenderer>();
         button = GetComponent<Button>();
         if (resolusion)
@@ -57,6 +67,37 @@ public class ButtonEvent : MonoBehaviour
             }
         }
     }
+    void OnEnable()
+    {
+        if (!colorOn)
+        {
+            if (PlayerPrefs.GetInt("SaveLevel") == 0)
+            {
+                textOriColor = new Color(0.8509804f, 0.7098039f, 0.2784314f, 1);
+                textChangeColor = new Color(0.6509804f, 0.4156863f, 0.007843138f, 1);
+                imageOriColor = new Color(0.7764706f, 0.6470588f, 0.2156863f, 1);
+                imageChangeColor = new Color(0.6509804f, 0.4156863f, 0.007843138f, 1);
+            }
+            else if (PlayerPrefs.GetInt("SaveLevel") == 1)
+            {
+                textOriColor = new Color(1, 1, 1, 1);
+                textChangeColor = new Color(0.5529412f, 0.5529412f, 0.5529412f, 1);
+                imageOriColor = new Color(1, 1, 1, 1);
+                imageChangeColor = new Color(0.5529412f, 0.5529412f, 0.5529412f, 1);
+                bTextOriColor = new Color(0, 0, 0, 1);
+                bTextChangeColor = new Color(0, 0, 0, 1);
+            }
+            else if (PlayerPrefs.GetInt("SaveLevel") == 2)
+            {
+                textOriColor = new Color(0.6666667f, 0.6666667f, 1, 1);
+                textChangeColor = new Color(0.4666667f, 0.4666667f, 1, 1);
+                imageOriColor = new Color(1, 1, 1, 1);
+                imageChangeColor = new Color(0.6509804f, 0.4156863f, 0.007843138f, 1);
+            }
+        }
+        colorOn = true;
+    }
+
     public void CheckButton()
     {
         // Debug.Log(gameObject.name);
@@ -68,11 +109,26 @@ public class ButtonEvent : MonoBehaviour
         buttonImages = GetComponentsInChildren<Image>(false);
         foreach (TMP_Text text in buttonTexts)
         {
-            text.color = new Color(0.3f, 0.5f, 0.8f, 1);
+            if (text.color == textChangeColor)
+            {
+                text.color = textOriColor;
+            }
+            // else if (text.color == Color.white || text.color == Color.black)
+            // {
+            //     text.color += textChangeColor;
+            // }
         }
         foreach (Image image in buttonImages)
         {
-            image.color = new Color(0.3f, 0.5f, 0.8f, 1);
+            if (image.color == textChangeColor)
+            {
+                image.color = textOriColor;
+                Debug.Log(image.name);
+            }
+            // else if (image.color == Color.white || image.color == Color.black)
+            // {
+            //     image.color += textChangeColor;
+            // }
         }
     }
     public void PointerUp()
@@ -81,11 +137,11 @@ public class ButtonEvent : MonoBehaviour
         buttonImages = GetComponentsInChildren<Image>(false);
         foreach (TMP_Text text in buttonTexts)
         {
-            text.color = new Color(1, 1, 1, 1);
+            text.color = textChangeColor;
         }
         foreach (Image image in buttonImages)
         {
-            image.color = new Color(1, 1, 1, 1);
+            image.color = textChangeColor;
         }
     }
     public void Next()

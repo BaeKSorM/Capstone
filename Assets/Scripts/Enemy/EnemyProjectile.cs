@@ -20,22 +20,25 @@ public class EnemyProjectile : MonoBehaviour
         {
             damage = CrossbowEnemy.Instance.attackDamage;
         }
+        else if (name.Contains("Turret"))
+        {
+            damage = TurretEnemy.Instance.attackDamage;
+        }
         else if (name.Contains("Bullet"))
         {
             damage = RifleEnemy.Instance.attackDamage;
         }
-        // else 
-        // if (name.Contains("Turret"))
-        // {
-        //     damage = TurretEnemy.Instance.attackDamage;
-        // }
+        else if (name.Contains("Turret"))
+        {
+            damage = TurretEnemy.Instance.attackDamage;
+        }
         if (name.Contains("Century"))
         {
             damage = Century21Boss.instance.attackDamage;
         }
-        if (name.Contains("Present"))
+        if (name.Contains("Rifle"))
         {
-            damage = 10;
+            damage = RifleEnemy.Instance.attackDamage;
         }
         StartCoroutine(Shoot());
         // shootPos =

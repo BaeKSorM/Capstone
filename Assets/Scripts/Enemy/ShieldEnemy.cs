@@ -16,6 +16,7 @@ public class ShieldEnemy : Creature
     [SerializeField] internal Transform enemyHpBar;
     [SerializeField] internal bool damageOn;
     [SerializeField] internal bool isDamaged;
+    [SerializeField] internal bool isDoing;
     [SerializeField] internal int LR;
 
     Rigidbody2D EnemyRB;
@@ -83,8 +84,9 @@ public class ShieldEnemy : Creature
     }
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("AttackSight") && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
+            isDoing = true;
             // 공격범위에 들어옴;
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
             {
@@ -116,6 +118,7 @@ public class ShieldEnemy : Creature
     }
     IEnumerator Attack(Collider2D other)
     {
+        isDoing = false;
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
             //공격

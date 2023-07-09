@@ -14,8 +14,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] internal GameObject pause, restart, control, keyPanel, setting, exit;
     [SerializeField] bool load;
     [SerializeField] internal List<Button> Buttons;
-
-
     [Tooltip("검은 색되고 바로 흰색으로 변하니까 잠깐기다리는 시간")]
     public float waitTime = 0.1f;
     [SerializeField] internal TMP_Text[] buttonTexts;
@@ -35,7 +33,8 @@ public class UIManager : MonoBehaviour
     float spriteRatio;
     float height;
     float width;
-
+    internal Color changeColor;
+    internal Color oriColor;
     private void Awake()
     {
         instance = this;
@@ -57,7 +56,7 @@ public class UIManager : MonoBehaviour
             loadingCanvas.SetActive(true);
             StartCoroutine(loading());
         }
-        if (GameManager.instance.SM)
+        if (pause != null && pause.activeSelf)
         {
             if (Input.GetKey((KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerController.instance.keys[0])) && !wait && !eventButton.GetComponent<ButtonEvent>().changeKey)
             {
@@ -242,11 +241,24 @@ public class UIManager : MonoBehaviour
                 buttonImages = Buttons[i].GetComponentsInChildren<Image>(false);
                 foreach (TMP_Text text in buttonTexts)
                 {
-                    text.color = new Color(0.3f, 0.5f, 0.8f, 1);
+                    if (text.color != ButtonEvent.instance.textChangeColor)
+                    {
+                        if (Buttons[i].GetComponent<ButtonEvent>().buttonText)
+                        {
+                            text.color = ButtonEvent.instance.bTextChangeColor;
+                        }
+                        else
+                        {
+                            text.color = ButtonEvent.instance.textChangeColor;
+                        }
+                    }
                 }
                 foreach (Image image in buttonImages)
                 {
-                    image.color = new Color(0.3f, 0.5f, 0.8f, 1);
+                    if (image.color != ButtonEvent.instance.imageChangeColor)
+                    {
+                        image.color = ButtonEvent.instance.imageChangeColor;
+                    }
                 }
                 count = i;
                 Debug.Log(i);
@@ -257,11 +269,24 @@ public class UIManager : MonoBehaviour
                 buttonImages = Buttons[i].GetComponentsInChildren<Image>(false);
                 foreach (TMP_Text text in buttonTexts)
                 {
-                    text.color = new Color(1, 1, 1, 1);
+                    if (text.color != ButtonEvent.instance.textOriColor)
+                    {
+                        if (Buttons[i].GetComponent<ButtonEvent>().buttonText)
+                        {
+                            text.color = ButtonEvent.instance.bTextChangeColor;
+                        }
+                        else
+                        {
+                            text.color = ButtonEvent.instance.textOriColor;
+                        }
+                    }
                 }
                 foreach (Image image in buttonImages)
                 {
-                    image.color = new Color(1, 1, 1, 1);
+                    if (image.color != ButtonEvent.instance.imageOriColor)
+                    {
+                        image.color = ButtonEvent.instance.imageOriColor;
+                    }
                 }
             }
 
@@ -275,6 +300,10 @@ public class UIManager : MonoBehaviour
         fadeInOut.inOrOut = FadeInOut.InOrOut.Out;
         yield return new WaitUntil(() => fadeInOut.fOut);
         // Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
+        if (!GameManager.instance.open && !GameManager.instance.end)
+        {
+            PlayerPrefs.SetFloat("PlayerHp", PlayerController.instance.hpbar.value);
+        }
         GameManager.instance.stageStart();
     }
 
@@ -302,6 +331,7 @@ public class UIManager : MonoBehaviour
         {
             Debug.Log(4);
             BrightButtonText(Buttons[0]);
+
             control.SetActive(false);
             for (int i = 0; i < keyPads.Count; ++i)
             {
@@ -320,16 +350,15 @@ public class UIManager : MonoBehaviour
             Debug.Log(5);
             BrightButtonText(Buttons[0]);
             setting.SetActive(false);
-            Time.timeScale = 1;
-            PlayerPrefs.SetInt("ScreenWidth", (int)targetResolution.x);
-            PlayerPrefs.SetInt("ScreenHeight", (int)targetResolution.y);
-            PlayerPrefs.SetString("mode", mode.ToString());
-            Screen.SetResolution((int)targetResolution.x, (int)targetResolution.y, mode);
+            Time.timeScale = 0;
+            SaveResolution();
+            SoundManager.instance.VolumeSave();
         }
         else
         {
             if (!pause.activeSelf)
             {
+                GameManager.instance.pause = true;
                 Debug.Log(6);
                 pause.SetActive(true);
                 Time.timeScale = 0;
@@ -337,11 +366,19 @@ public class UIManager : MonoBehaviour
             }
             else if (pause.activeSelf)
             {
+                GameManager.instance.pause = false;
                 Debug.Log(7);
                 pause.SetActive(false);
                 Time.timeScale = 1;
             }
         }
+    }
+    public void SaveResolution()
+    {
+        PlayerPrefs.SetInt("ScreenWidth", (int)targetResolution.x);
+        PlayerPrefs.SetInt("ScreenHeight", (int)targetResolution.y);
+        PlayerPrefs.SetString("mode", mode.ToString());
+        Screen.SetResolution((int)targetResolution.x, (int)targetResolution.y, mode);
     }
     public void Resume()
     {

@@ -11,13 +11,14 @@ public class RestEnemy : Creature
     [SerializeField] internal Transform enemyHpBar;
     [SerializeField] internal bool isDamaged;
     [SerializeField] internal int LR;
+    [SerializeField] internal bool isDoing;
     [SerializeField] internal bool isSpawned;
 
     Canvas canvas;
     Rigidbody2D EnemyRB;
     void Start()
     {
-        // speed = 5.0f;
+        speed = 2.0f;
         // range = 2.0f;
         // time = 1.0f;
         // delayTime = 1.0f;
@@ -53,8 +54,9 @@ public class RestEnemy : Creature
     }
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("AttackSight") && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
+            isDoing = true;
             // 공격범위에 들어옴;
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
             {
@@ -88,6 +90,7 @@ public class RestEnemy : Creature
     }
     IEnumerator Attack(Collider2D other)
     {
+        isDoing = false;
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)
         {
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack)

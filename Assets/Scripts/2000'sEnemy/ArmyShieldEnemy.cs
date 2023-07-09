@@ -15,6 +15,8 @@ public class ArmyShieldEnemy : Creature
     [SerializeField] internal Transform enemyHpBar;
     [SerializeField] internal bool damageOn;
     [SerializeField] internal bool isDamaged;
+    [SerializeField]
+    internal bool isDoing;
     [SerializeField] internal int LR;
 
     Rigidbody2D EnemyRB;
@@ -64,6 +66,27 @@ public class ArmyShieldEnemy : Creature
         {
             PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
         }
+    }
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
+        {
+            isDoing = true;
+            // 공격범위에 들어옴;
+            while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
+            {
+                LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
+                transform.localScale = new Vector2(LR, 1);
+                anim.SetBool("isWalk", true);
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
+            }
+            Stop();
+        }
+    }
+    void Stop()
+    {
+        isDoing = false;
+        anim.SetBool("isWalk", false);
     }
     void OnTriggerExit2D(Collider2D other)
     {

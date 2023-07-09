@@ -10,6 +10,7 @@ public class DroneEnemy : Creature
     [SerializeField] internal float damage;
     [SerializeField] internal float saveDamage;
     [SerializeField] bool inside;
+    [SerializeField] bool isDoing;
     void Awake()
     {
         anim = GetComponent<Animator>();
@@ -17,9 +18,10 @@ public class DroneEnemy : Creature
     }
     IEnumerator OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("AttackSight") && !isDamaged)
+        if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
             inside = true;
+            isDoing = true;
             anim.SetBool("detected", true);
             // 공격범위에 들어옴;
             while (Vector2.Distance(transform.position, other.transform.parent.position) > range && !isAttack && inside)
@@ -28,6 +30,7 @@ public class DroneEnemy : Creature
                 transform.position = Vector2.MoveTowards(transform.position, other.transform.position, 0.01f);
                 yield return null;
             }
+            isDoing = false;
             if (Vector2.Distance(transform.position, other.transform.parent.position) < range)
             {
                 StartCoroutine(SuicideBombing());
@@ -45,6 +48,7 @@ public class DroneEnemy : Creature
     }
     IEnumerator SuicideBombing()
     {
+        isDoing = false;
         isAttack = true;
         anim.SetTrigger("bombReady");
         yield return new WaitForSeconds(time);

@@ -28,6 +28,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] internal enum eAge { 로마, 현대, 미래 };
     [SerializeField] internal eAge age;
     [SerializeField] public bool SM;
+    [SerializeField] public bool pause;
+    [SerializeField] public bool inGame;
+    [SerializeField] public bool open;
+    [SerializeField] public bool end;
+
 
     [Tooltip("보스 등장했는지")]
     [SerializeField] internal bool bossAppear;
@@ -39,12 +44,12 @@ public class GameManager : MonoBehaviour
         instance = this;
         // 첫스테이지
         //UIManager.instance.
-        PlayerPrefs.SetFloat("PlayerHp", 100);
+        // PlayerPrefs.SetFloat("PlayerHp", 100);
         // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
         //테스트용
         PlayerPrefs.SetInt("SaveLevel", 2);
         age = (eAge)PlayerPrefs.GetInt("SaveLevel");
-        // Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
+        Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
     }
     void Start()
     {
@@ -52,19 +57,13 @@ public class GameManager : MonoBehaviour
         audioClips = Resources.LoadAll<AudioClip>("AudioClips");
         Texture2D[] cursors = Resources.LoadAll<Texture2D>("Cursors");
         Sprite[] sprites = Resources.LoadAll<Sprite>("Images");
-        Debug.Log(sprites.Length);
-        Debug.Log(cursors.Length);
-        foreach (Texture2D cursor in cursors)
+        // Debug.Log(sprites.Length);
+        // Debug.Log(cursors.Length);
+        if (open || end)
         {
-            if (cursor.name == stages[PlayerPrefs.GetInt("SaveLevel")] + "Cursor")
-            {
-                Cursor.SetCursor(cursor, Vector2.zero, CursorMode.ForceSoftware);
-                Debug.Log("found");
-                break;
-            }
-            Debug.Log(cursor.name);
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
         }
-        if (SM)
+        else
         {
             Screen.SetResolution(PlayerPrefs.GetInt("ScreenWidth"), PlayerPrefs.GetInt("ScreenHeight"), (FullScreenMode)System.Enum.Parse(typeof(FullScreenMode), PlayerPrefs.GetString("mode"), true));
             {
@@ -72,8 +71,18 @@ public class GameManager : MonoBehaviour
                 SoundManager.instance.audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("Music"));
                 SoundManager.instance.audioMixer.SetFloat("SoundEffect", PlayerPrefs.GetFloat("SFX"));
             }
+            PlayerController.instance.hpbar.value = PlayerPrefs.GetFloat("PlayerHp");
+            foreach (Texture2D cursor in cursors)
+            {
+                if (cursor.name == stages[PlayerPrefs.GetInt("SaveLevel")] + "Cursor")
+                {
+                    Cursor.SetCursor(cursor, Vector2.zero, CursorMode.ForceSoftware);
+                    // Debug.Log("found");
+                    break;
+                }
+                // Debug.Log(cursor.name);
+            }
         }
-        // PlayerController.instance.hpbar.value = PlayerPrefs.GetFloat("PlayerHp");
         for (int i = 0; i < dropEnemiesMaxCount; ++i)
         {
             int rand = Random.Range(0, enemies.Count);
@@ -86,15 +95,54 @@ public class GameManager : MonoBehaviour
                 --i;
             }
         }
-        for (int i = 0; i < audioClips.Length; ++i)
+        if (inGame)
         {
-            if (audioClips[i].name == stages[PlayerPrefs.GetInt("SaveLevel")] + "Opening")
+            for (int i = 0; i < audioClips.Length; ++i)
             {
-                audioSource.clip = audioClips[i];
-                break;
+                if (audioClips[i].name == stages[PlayerPrefs.GetInt("SaveLevel")] + "Opening")
+                {
+                    audioSource.clip = audioClips[i];
+                    break;
+                }
             }
         }
-        Debug.Log(stages[PlayerPrefs.GetInt("SaveLevel")]);
+        else
+        {
+            if (open)
+            {
+                for (int i = 0; i < audioClips.Length; ++i)
+                {
+                    if (audioClips[i].name == "Opening")
+                    {
+                        audioSource.clip = audioClips[i];
+                        break;
+                    }
+                }
+            }
+            else if (end)
+            {
+                for (int i = 0; i < audioClips.Length; ++i)
+                {
+                    if (audioClips[i].name == "Ending")
+                    {
+                        audioSource.clip = audioClips[i];
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < audioClips.Length; ++i)
+                {
+                    if (audioClips[i].name == "Ending")
+                    {
+                        audioSource.clip = audioClips[i];
+                        break;
+                    }
+                }
+            }
+        }
+        // Debug.Log(stages[PlayerPrefs.GetInt("SaveLevel")]);
         audioSource.Play();
     }
     void Update()
@@ -104,7 +152,18 @@ public class GameManager : MonoBehaviour
             UIManager.instance.Pause();
         }
     }
-
+    public void BossStageOn()
+    {
+        for (int i = 0; i < audioClips.Length; ++i)
+        {
+            if (audioClips[i].name == stages[PlayerPrefs.GetInt("SaveLevel")] + "BossOpening")
+            {
+                audioSource.clip = audioClips[i];
+                break;
+            }
+        }
+        audioSource.Play();
+    }
     internal void show_ItemInfo(int nearby_Item)
     {
         if (beforeSteped != -1 && nearby_Item != beforeSteped)
@@ -120,12 +179,9 @@ public class GameManager : MonoBehaviour
         enemiesDropedWeapons.GetChild(nearby_Item).GetChild(0).gameObject.SetActive(false);
         PlayerController.instance.isTouching = false;
     }
-    /// <summary>
-    /// 스테이지 불러오기
-    /// </summary>
-    /// <param name="_stageLevel">이동할 스테이지</param>
     public void stageStart()
     {
+        Debug.Log(stages[PlayerPrefs.GetInt("SaveLevel")]);
         SceneManager.LoadScene(stages[PlayerPrefs.GetInt("SaveLevel")]);
     }
     public void GameClear()

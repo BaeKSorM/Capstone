@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal Camera mainCam;
     [SerializeField] internal Vector3 bossReadyPos;
     [SerializeField] private LayerMask mask;
-    [SerializeField] private float dis;
+    [SerializeField] internal float dis;
     [SerializeField] internal float reduce;
     [SerializeField] internal string[] keys;
     [SerializeField] internal Image[] itemIcons;
@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Update()
     {
-        if (!isCinematic)
+        if (!isCinematic && !GameManager.instance.pause)
         {
             Jump();
             if (!anim.GetBool("isAttack"))
@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (!isCinematic && !anim.GetBool("isAttack"))
+        if (!isCinematic && !anim.GetBool("isAttack") && !GameManager.instance.pause)
         {
             Move();
         }
@@ -128,11 +128,11 @@ public class PlayerController : MonoBehaviour
                 audioSource.clip = audioClips[i];
             }
         }
-        audioSource.Play();
+        // audioSource.Play();
         reduce = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
         transform.Find(weaponNames[0]).gameObject.SetActive(true);
         yield return new WaitForSeconds(time);
-        audioSource.Stop();
+        // audioSource.Stop();
         transform.Find(weaponNames[0]).gameObject.SetActive(false);
         transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = 0;
         anim.SetBool("isAttack", false);
@@ -152,6 +152,7 @@ public class PlayerController : MonoBehaviour
         transform.position = new Vector2(cameraManager.bossGroundCenter.x, cameraManager.bossGroundCenter.y);
         GameManager.instance.bossAppear = true;
         fadeInOut.inOrOut = FadeInOut.InOrOut.In;
+        GameManager.instance.BossStageOn();
         // 도망 이동 시키기
         yield return new WaitForSeconds(1.0f);
         anim.SetBool("isMove", true);
@@ -277,7 +278,8 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, dis, mask);
         if (hit)
         {
-            cameraManager.camPos = transform.position.y + 1.5f - dis;//원래2.3
+            cameraManager.groundPos = transform.position.y;
+            cameraManager.camPos = transform.position.y + dis;//dis는 한번 점프 높이 + α
             isJumped = false;
             jumpCount = 0;
             anim.SetBool("isJump", false);
@@ -347,12 +349,12 @@ public class PlayerController : MonoBehaviour
             }
             else if (other.name.Contains("Boss"))
             {
+                Debug.Log(other.name);
                 float bDamage = other.GetComponentInParent<RomeBoss>().attackDamage;
                 hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
             }
             else
             {
-                // Debug.Log(other.name);
                 float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
                 hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
             }
@@ -425,8 +427,8 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("boss");
                 if (other.GetComponent<PresentBoss>().skills == PresentBoss.eSkills.맵회전)
                 {
-                    Debug.Log("roll");
                     float bDamage = other.GetComponent<PresentBoss>().damage;
+                    Debug.Log(bDamage);
                     hpbar.value -= bDamage;
                 }
             }
@@ -443,9 +445,9 @@ public class PlayerController : MonoBehaviour
                 hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
             }
         }
+        Debug.Log(other.name);
         if (hpbar.value <= 0)
         {
-            Debug.Log(0);
             PlayerPrefs.SetInt("SaveLevel", 0);
             Debug.Log("hp0");
             StartCoroutine(UIManager.instance.loading());

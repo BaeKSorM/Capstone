@@ -12,6 +12,8 @@ public class LaserSniperEnemy : MonoBehaviour
     [SerializeField] internal GameObject turret;
     [SerializeField] internal bool isFollowing;
     Laser laser;
+    float LR;
+    Quaternion q;
     void Start()
     {
         laser = GetComponentInChildren<Laser>();
@@ -29,6 +31,8 @@ public class LaserSniperEnemy : MonoBehaviour
         if (isFollowing)
         {
             FollowingLaser();
+            LR = p.transform.position.x > transform.position.x ? -1 : 1;
+            transform.localScale = new Vector2(LR, 1);
         }
     }
     void FollowingLaser()
@@ -37,15 +41,23 @@ public class LaserSniperEnemy : MonoBehaviour
         {
             deg = -GetAngleBetweenVectors(p.transform.position, gameObject.transform.position);
             float rad = deg * Mathf.Deg2Rad;
-            turret.transform.localPosition = new Vector2(Mathf.Cos(rad) * -0.5f, Mathf.Sin(rad) * -0.5f);
+            // turret.transform.localPosition = new Vector2(Mathf.Cos(rad) * -0.5f, Mathf.Sin(rad) * -0.5f);
         }
-        else if (p.transform.position.y < transform.position.y)
+        else
+        if (p.transform.position.y < transform.position.y)
         {
             deg = GetAngleBetweenVectors(p.transform.position, gameObject.transform.position);
             float rad = deg * Mathf.Deg2Rad;
-            turret.transform.localPosition = new Vector2(Mathf.Cos(rad) * -0.5f, Mathf.Sin(rad) * -0.5f);
+            // turret.transform.localPosition = new Vector2(Mathf.Cos(rad) * -0.5f, Mathf.Sin(rad) * -0.5f);
         }
-        Quaternion q = Quaternion.Euler(new Vector3(0, 0, deg));
+        if (LR == 1)
+        {
+            q = Quaternion.Euler(new Vector3(0, 0, deg % 90));
+        }
+        else
+        {
+            q = Quaternion.Euler(new Vector3(0, 0, (deg + 180) % 90));
+        }
         turret.transform.rotation = Quaternion.Slerp(turret.transform.rotation, q, 0.01f);
     }
     IEnumerator FollowOrDamage()
