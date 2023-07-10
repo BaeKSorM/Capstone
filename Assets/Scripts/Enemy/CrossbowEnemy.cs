@@ -51,7 +51,7 @@ public class CrossbowEnemy : Creature
             LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
         }
-        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
+        else if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
         {
             PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
         }

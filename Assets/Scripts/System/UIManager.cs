@@ -82,7 +82,7 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator DownCheck()
     {
-        float c = 0;
+        yield return null;
         wait = true;
         if (count < 4)
         {
@@ -116,7 +116,8 @@ public class UIManager : MonoBehaviour
         {
             BrightButtonText(Buttons[25]);
         }
-        while (c < 0.09f)
+        float c = 0;
+        while (c < 1.1f)
         {
             c += Time.unscaledDeltaTime;
             yield return null;
@@ -125,7 +126,7 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator LeftCheck()
     {
-        float c = 0;
+        yield return null;
         wait = true;
         if (count == 23)
         {
@@ -148,7 +149,8 @@ public class UIManager : MonoBehaviour
         {
             Buttons[count].transform.Find("Left").GetComponent<Button>().onClick.Invoke();
         }
-        while (c < 0.09f)
+        float c = 0;
+        while (c < 1.1f)
         {
             c += Time.unscaledDeltaTime;
             yield return null;
@@ -157,7 +159,7 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator RightCheck()
     {
-        float c = 0;
+        yield return null;
         wait = true;
         if (count == 22)
         {
@@ -180,7 +182,8 @@ public class UIManager : MonoBehaviour
         {
             Buttons[count].transform.Find("Right").GetComponent<Button>().onClick.Invoke();
         }
-        while (c < 0.09f)
+        float c = 0;
+        while (c < 1.1f)
         {
             c += Time.unscaledDeltaTime;
             yield return null;
@@ -189,7 +192,7 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator UpCheck()
     {
-        float c = 0;
+        yield return null;
         wait = true;
         if (count == 23)
         {
@@ -223,14 +226,23 @@ public class UIManager : MonoBehaviour
         {
             BrightButtonText(Buttons[4]);
         }
-        while (c < 0.09f)
+        float c = 0;
+        while (c < 1.1f)
         {
             c += Time.unscaledDeltaTime;
             yield return null;
         }
         wait = false;
     }
-
+    IEnumerator CheckWait()
+    {
+        float c = 0;
+        while (c < 1.1f)
+        {
+            c += Time.unscaledDeltaTime;
+            yield return null;
+        }
+    }
     internal void BrightButtonText(Button bright)
     {
         for (int i = 0; i < Buttons.Count; ++i)
@@ -299,6 +311,13 @@ public class UIManager : MonoBehaviour
     {
         fadeInOut.inOrOut = FadeInOut.InOrOut.Out;
         yield return new WaitUntil(() => fadeInOut.fOut);
+        if (!GameManager.instance.open && !GameManager.instance.end)
+        {
+            if (PlayerController.instance.hpbar.value <= 0)
+            {
+                PlayerController.instance.hpbar.value = PlayerController.instance.hpbar.maxValue;
+            }
+        }
         // Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
         if (!GameManager.instance.open && !GameManager.instance.end)
         {

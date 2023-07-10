@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: background_roma_8
+  m_Name: background_roma_11 - Copy
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: bc582a9898624574ea18c59499991c4d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 15e18f9454c615f46ab7b21e544d585d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

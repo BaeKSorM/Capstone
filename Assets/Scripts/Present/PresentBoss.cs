@@ -88,7 +88,7 @@ public class PresentBoss : MonoBehaviour
                 LR = transform.position.x > player.position.x ? 1 : -1;
                 skillEnd = false;
                 // 확률도 조정해야함
-                switch (Random.Range(0, 0))
+                switch (Random.Range(0, 4))
                 {
                     case 0:
                         Debug.Log(0);
@@ -138,7 +138,7 @@ public class PresentBoss : MonoBehaviour
         bossBC.isTrigger = true;
         int LR = transform.position.x > player.position.x ? 1 : -1;
         transform.localScale = new Vector2(LR, 1);
-        anim.SetBool("Roll", true);
+        // anim.SetBool("Roll", true);
         RaycastHit2D hit;
         Vector2 curPos = transform.position;
         hit = Physics2D.Raycast(transform.position, Vector2.left * LR, dis, wgMask);
