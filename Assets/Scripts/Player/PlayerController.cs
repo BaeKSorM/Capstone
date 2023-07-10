@@ -298,10 +298,6 @@ public class PlayerController : MonoBehaviour
         {
             Damaged(other);
         }
-        if (other.gameObject.layer == "Passible")
-        {
-
-        }
     }
     void OnTriggerExit2D(Collider2D other)
     {

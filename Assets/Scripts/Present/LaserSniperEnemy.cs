@@ -28,7 +28,7 @@ public class LaserSniperEnemy : MonoBehaviour
     }
     void Update()
     {
-        if (isFollowing && !GameManager.instance.pause)
+        if (isFollowing)
         {
             FollowingLaser();
             LR = p.transform.position.x > transform.position.x ? -1 : 1;
@@ -40,11 +40,15 @@ public class LaserSniperEnemy : MonoBehaviour
         if (p.transform.position.y > transform.position.y)
         {
             deg = -GetAngleBetweenVectors(p.transform.position, gameObject.transform.position);
+            float rad = deg * Mathf.Deg2Rad;
+            // turret.transform.localPosition = new Vector2(Mathf.Cos(rad) * -0.5f, Mathf.Sin(rad) * -0.5f);
         }
         else
         if (p.transform.position.y < transform.position.y)
         {
             deg = GetAngleBetweenVectors(p.transform.position, gameObject.transform.position);
+            float rad = deg * Mathf.Deg2Rad;
+            // turret.transform.localPosition = new Vector2(Mathf.Cos(rad) * -0.5f, Mathf.Sin(rad) * -0.5f);
         }
         if (LR == 1)
         {
@@ -63,8 +67,8 @@ public class LaserSniperEnemy : MonoBehaviour
             isFollowing = true;
             yield return new WaitForSeconds(followTime);
             laser.anim.SetTrigger("red");
-            isFollowing = false;
             yield return new WaitForSeconds(0.5f);
+            isFollowing = false;
             laser.anim.SetTrigger("skyBlue");
             yield return new WaitForSeconds(damagingTime);
         }
