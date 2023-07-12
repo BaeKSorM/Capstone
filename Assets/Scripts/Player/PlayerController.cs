@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] internal bool isTouching;
     [SerializeField] internal bool dyspnoea;
     [SerializeField] internal bool oscillation;
+    [SerializeField] internal bool passing;
     [SerializeField] internal float reduceDamage;
     [SerializeField] internal GameObject fadeCan;
     [SerializeField] internal GameObject bossHpbar;
@@ -67,6 +68,11 @@ public class PlayerController : MonoBehaviour
         audioClips = Resources.LoadAll<AudioClip>("AudioClips/");
         itemIcons[0].sprite = Resources.Load<Sprite>("Weapons/" + GameManager.instance.stages[PlayerPrefs.GetInt("SaveLevel")] + "/" + weaponNames[0]);
         time = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().time;
+        GameObject shield = transform.Find("Shield").gameObject;
+        if (shield.activeSelf)
+        {
+            shield.SetActive(false);
+        }
         if (isCinematic)
         {
             yield return new WaitForSeconds(fadeInOut.fadeTime);
@@ -77,7 +83,6 @@ public class PlayerController : MonoBehaviour
     {
         if (!isCinematic && !GameManager.instance.pause)
         {
-            Jump();
             if (!anim.GetBool("isAttack"))
             {
                 ViewDirection();
@@ -88,6 +93,22 @@ public class PlayerController : MonoBehaviour
                 if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[7])) && weaponNames[1] != "")
                 {
                     swapWeapons();
+                }
+                if (Input.GetKey((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[1])) && passing)
+                {
+                    if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[6])))
+                    {
+                        //페싱에서 아래로
+                        Physics2D.IgnoreLayerCollision(7, 20, true);
+                        Debug.Log("job");
+                        passing = false;
+                    }
+                }
+                else if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[6])))
+                {
+                    //점프
+                    Jump();
+                    Debug.Log("job");
                 }
                 if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[4])))
                 {
@@ -129,13 +150,15 @@ public class PlayerController : MonoBehaviour
             }
         }
         // audioSource.Play();
-        reduce = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
+        transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = Random.Range(getWeapons[0].GetComponent<DropedWeapons>().mindamage, getWeapons[0].GetComponent<DropedWeapons>().maxdamage);
+        reduce = transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage;
         transform.Find(weaponNames[0]).gameObject.SetActive(true);
         yield return new WaitForSeconds(time);
         // audioSource.Stop();
         transform.Find(weaponNames[0]).gameObject.SetActive(false);
         transform.Find(weaponNames[0]).gameObject.GetComponent<PlayerWeapons>().damage = 0;
         anim.SetBool("isAttack", false);
+        reduceDamage = 0;
     }
     IEnumerator BossStageOn()
     {
@@ -168,11 +191,11 @@ public class PlayerController : MonoBehaviour
     }
     private void ViewDirection()
     {
-        if (playerRB.velocity.x > 0.04f)
+        if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[3])))
         {
             transform.localScale = new Vector2(1, 1);
         }
-        if (playerRB.velocity.x < -0.04f)
+        if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[2])))
         {
             transform.localScale = new Vector2(-1, 1);
         }
@@ -250,7 +273,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Jump()
     {
-        if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), keys[6])) && jumpCount < maxJumpCount)
+        if (jumpCount < maxJumpCount)
         {
             ++jumpCount;
             anim.SetBool("isJump", true);
@@ -272,6 +295,8 @@ public class PlayerController : MonoBehaviour
     internal void Reduce()
     {
         reduceDamage = reduce;
+        Debug.Log(reduce);
+        Debug.Log(reduceDamage);
     }
     void checkGround()
     {
@@ -287,9 +312,26 @@ public class PlayerController : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("BottomGround"))
+        if (other.gameObject.tag.Contains("Ground"))
         {
             checkGround();
+            if (other.gameObject.layer == LayerMask.NameToLayer("Passible"))
+            {
+                cameraManager.ground = CameraManager.eGround.mid;
+                passing = true;
+                Debug.Log("col");
+            }
+            else if (other.gameObject.tag.Contains("Mid"))
+            {
+                cameraManager.ground = CameraManager.eGround.mid;
+                passing = false;
+            }
+            else if (other.gameObject.tag.Contains("Bottom"))
+            {
+                Debug.Log(other.gameObject.name);
+                cameraManager.ground = CameraManager.eGround.under;
+                passing = false;
+            }
         }
     }
     void OnTriggerEnter2D(Collider2D other)
@@ -298,9 +340,25 @@ public class PlayerController : MonoBehaviour
         {
             Damaged(other);
         }
+        if (other.tag.Contains("Ground"))
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Passible"))
+            {
+                Debug.Log("true");
+                Physics2D.IgnoreLayerCollision(7, 20, true);
+            }
+        }
     }
     void OnTriggerExit2D(Collider2D other)
     {
+        if (other.tag.Contains("Ground"))
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Passible"))
+            {
+                passing = false;
+                Physics2D.IgnoreLayerCollision(7, 20, false);
+            }
+        }
         if (other.name.Contains("Gas"))
         {
             if (dyspnoea)
@@ -336,70 +394,80 @@ public class PlayerController : MonoBehaviour
         {
             if (other.name.Contains("Arrow"))//무기이름
             {
+                Debug.Log(other.name);
                 float aDamage = other.GetComponent<EnemyProjectile>().projectileDamage;
-                hpbar.value -= (aDamage - reduceDamage) > 0 ? (aDamage - reduceDamage) : 0;
+                hpbar.value -= aDamage;
             }
             else if (other.name.Contains("Shield"))
             {
                 if (other.GetComponentInParent<ShieldEnemy>().damageOn)
                 {
+                    Debug.Log(other.name);
                     float sDamage = other.GetComponentInParent<ShieldEnemy>().attackDamage;
-                    hpbar.value -= (sDamage - reduceDamage) > 0 ? (sDamage - reduceDamage) : 0;
+                    hpbar.value -= sDamage;
                 }
             }
             else if (other.name.Contains("Boss"))
             {
                 Debug.Log(other.name);
                 float bDamage = other.GetComponentInParent<RomeBoss>().attackDamage;
-                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
+                hpbar.value -= bDamage;
             }
-            else
+            else if (other != null && other.name.Contains("Sword"))
             {
-                float rDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
-                hpbar.value -= (rDamage - reduceDamage) > 0 ? (rDamage - reduceDamage) : 0;
+                Debug.Log(other.name);
+                float rDamage = other.GetComponentInParent<SwordEnemy>().attackDamage;
+                hpbar.value -= rDamage;
             }
             // Debug.Log(other.name);
         }
         else if (GameManager.instance.age == GameManager.eAge.현대)
         {
-            if (other.name.Contains("Shotgun"))
+            if (other != null && other.name.Contains("Shotgun"))
             {
-                float shotDamage = other.GetComponentInParent<RestEnemy>().attackDamage;
-                Debug.Log(shotDamage);
-                hpbar.value -= (shotDamage - reduceDamage) > 0 ? (shotDamage - reduceDamage) : 0;
+                Debug.Log(other.name);
+                float sDamage = other.GetComponentInParent<SwordEnemy>().attackDamage;
+                Debug.Log(sDamage);
+                hpbar.value -= sDamage;
             }
             else if (other.name.Contains("Boss"))
             {
-                float bDamage = other.GetComponentInParent<RomeBoss>().attackDamage;
-                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
+                Debug.Log(other.name);
+                float bDamage = other.GetComponentInParent<Century21Boss>().attackDamage;
+                hpbar.value -= bDamage;
             }
             else if (other.name.Contains("Bullet"))
             {
-                float bDamage = other.GetComponentInParent<EnemyProjectile>().projectileDamage;
-                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
+                Debug.Log(other.name);
+                float bDamage = other.GetComponent<EnemyProjectile>().projectileDamage;
+                hpbar.value -= bDamage;
             }
             else if (other.name.Contains("Gas"))
             {
                 if (other.GetComponent<Gas>().isGas && !dyspnoea)
                 {
+                    Debug.Log(other.name);
                     StartCoroutine(GDamagePerSecond(other));
                 }
             }
             else if (other.name.Contains("Button"))
             {
+                Debug.Log(other.name);
                 float bDamage = other.GetComponentInParent<LandMine>().damage;
-                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
+                hpbar.value -= bDamage;
             }
             else if (other.name.Contains("Aerial"))
             {
+                Debug.Log(other.name);
                 float aDamage = other.GetComponent<AerialBomb>().damage;
-                hpbar.value -= (aDamage - reduceDamage) > 0 ? (aDamage - reduceDamage) : 0;
+                hpbar.value -= aDamage;
             }
         }
         else if (GameManager.instance.age == GameManager.eAge.미래)
         {
             if (other.name.Contains("Beam"))
             {
+                Debug.Log(other.name);
                 Laser laser = other.GetComponent<Laser>();
                 float lDamage = laser.damage;
                 hpbar.value -= lDamage;
@@ -408,17 +476,19 @@ public class PlayerController : MonoBehaviour
             {
                 if (other.GetComponent<DroneEnemy>().bombing)
                 {
+                    Debug.Log(other.name);
                     float dDamage = other.GetComponent<DroneEnemy>().damage;
-                    Debug.Log(dDamage);
                     hpbar.value -= dDamage;
                 }
             }
             else if (other.name.Contains("Agari"))
             {
+                Debug.Log(other.name);
                 StartCoroutine(AgariDam(other));
             }
             else if (other.name.Contains("AIM120B"))
             {
+                Debug.Log(other.name);
                 float aDamage = other.GetComponent<AIM120B>().damage;
                 hpbar.value -= aDamage;
             }
@@ -427,6 +497,7 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("boss");
                 if (other.GetComponent<PresentBoss>().skills == PresentBoss.eSkills.맵회전)
                 {
+                    Debug.Log(other.name);
                     float bDamage = other.GetComponent<PresentBoss>().damage;
                     Debug.Log(bDamage);
                     hpbar.value -= bDamage;
@@ -436,16 +507,17 @@ public class PlayerController : MonoBehaviour
             {
                 if (other.GetComponent<Wave>().isWave && !oscillation)
                 {
+                    Debug.Log(other.name);
                     StartCoroutine(WaveDam(other));
                 }
             }
             else if (other.name.Contains("Bullet"))
             {
+                Debug.Log(other.name);
                 float bDamage = other.GetComponentInParent<EnemyProjectile>().projectileDamage;
-                hpbar.value -= (bDamage - reduceDamage) > 0 ? (bDamage - reduceDamage) : 0;
+                hpbar.value -= bDamage;
             }
         }
-        Debug.Log(other.name);
         if (hpbar.value <= 0)
         {
             PlayerPrefs.SetInt("SaveLevel", 0);

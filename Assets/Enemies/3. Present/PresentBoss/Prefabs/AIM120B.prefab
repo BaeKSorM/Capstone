@@ -115,6 +115,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  launchSpeed: 3
+  flySpeed: 30
+  rotSpeed: 30
   p: {fileID: 0}
   targetPos: {fileID: 0}
   rise: 2
@@ -122,3 +125,6 @@ MonoBehaviour:
   LR: 0
   anim: {fileID: 0}
   bombing: 0
+  q: {x: 0, y: 0, z: 0, w: 0}
+  direction: {x: 0, y: 0, z: 0}
+  q2: {x: 0, y: 0, z: 0, w: 0}

@@ -258,6 +258,7 @@ MonoBehaviour:
   wait: 0
   eventButton: {fileID: 0}
   exceptionKeys: 
+  checkDelay: 0
 --- !u!4 &704813787
 Transform:
   m_ObjectHideFlags: 0
@@ -498,12 +499,12 @@ AudioSource:
   m_GameObject: {fileID: 1172849985}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -8214503152650670218, guid: 034c098f6563d4b4d8499aaffeb56a12, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

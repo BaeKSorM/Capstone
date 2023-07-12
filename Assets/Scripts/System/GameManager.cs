@@ -44,10 +44,10 @@ public class GameManager : MonoBehaviour
         instance = this;
         // 첫스테이지
         //UIManager.instance.
-        // PlayerPrefs.SetFloat("PlayerHp", 100);
+        PlayerPrefs.SetFloat("PlayerHp", 100);
         // PlayerPrefs.SetInt("SaveLevel", saveStageLevel);
         //테스트용
-        PlayerPrefs.SetInt("SaveLevel", 2);
+        PlayerPrefs.SetInt("SaveLevel", 0);
         age = (eAge)PlayerPrefs.GetInt("SaveLevel");
         Debug.Log(PlayerPrefs.GetInt("SaveLevel"));
     }
@@ -57,8 +57,6 @@ public class GameManager : MonoBehaviour
         audioClips = Resources.LoadAll<AudioClip>("AudioClips");
         Texture2D[] cursors = Resources.LoadAll<Texture2D>("Cursors");
         Sprite[] sprites = Resources.LoadAll<Sprite>("Images");
-        // Debug.Log(sprites.Length);
-        // Debug.Log(cursors.Length);
         if (open || end)
         {
             Cursor.SetCursor(null, Vector2.zero, CursorMode.ForceSoftware);
@@ -67,6 +65,9 @@ public class GameManager : MonoBehaviour
         {
             Screen.SetResolution(PlayerPrefs.GetInt("ScreenWidth"), PlayerPrefs.GetInt("ScreenHeight"), (FullScreenMode)System.Enum.Parse(typeof(FullScreenMode), PlayerPrefs.GetString("mode"), true));
             {
+                // Debug.Log(PlayerPrefs.GetFloat("Volume"));
+                // Debug.Log(PlayerPrefs.GetFloat("Music"));
+                // Debug.Log(PlayerPrefs.GetFloat("SFX"));
                 SoundManager.instance.audioMixer.SetFloat("Volume", PlayerPrefs.GetFloat("Volume"));
                 SoundManager.instance.audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("Music"));
                 SoundManager.instance.audioMixer.SetFloat("SoundEffect", PlayerPrefs.GetFloat("SFX"));

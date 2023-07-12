@@ -56,9 +56,8 @@ public class CameraManager : MonoBehaviour
                 }
                 //떨어질때
                 else
-                if (player.position.y < groundPos)
+                if (player.position.y < groundPos - 0.1f)
                 {
-                    Debug.Log("1234567890");
                     if (player.position.x >= bossDoorFornt.x)
                     {
                         targetPos = new Vector3(bossDoorFornt.x, player.position.y, this.transform.position.z);

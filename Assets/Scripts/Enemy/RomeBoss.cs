@@ -22,7 +22,9 @@ public class RomeBoss : MonoBehaviour
     [Tooltip("공격 거리")]
     [SerializeField] internal float range = 2.0f;
     [Tooltip("공격 데미지")]
-    [SerializeField] internal float attackDamage = 2.5f;
+    [SerializeField] internal float attackDamage;
+    [Tooltip("저장되는 대미지")]
+    [SerializeField] internal float saveDamage = 2.5f;
     [SerializeField] internal bool skillEnd;
     [SerializeField] internal float healingTime;
     [SerializeField] internal float healAmountPerSecond = 1.0f;
@@ -38,9 +40,11 @@ public class RomeBoss : MonoBehaviour
     [SerializeField] internal int arriveSpawnedMobs;
     [SerializeField] Vector3 bossAppear = new Vector2(23, -1.99f);
     [SerializeField] internal CameraManager cameraManager;
+    [SerializeField] GameObject shield;
     Rigidbody2D bossRB;
     void Start()
     {
+        shield = GameObject.Find("Shield");
         bossRB = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         // weapon = transform.GetChild(1).gameObject;
@@ -70,12 +74,14 @@ public class RomeBoss : MonoBehaviour
         }
         if (other.CompareTag("Player"))
         {
-            if (other.transform.Find("Shield").gameObject.activeSelf)
+            if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
             {
-                if (Mathf.Abs(transform.position.x - other.transform.position.x) > Mathf.Abs(transform.position.x - other.transform.Find("Shield").position.x) ? true : false)
-                {
-                    PlayerController.instance.Reduce();
-                }
+                attackDamage = saveDamage;
+                attackDamage -= attackDamage - PlayerController.instance.reduce > 0 ? PlayerController.instance.reduce : attackDamage;
+            }
+            else if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
+            {
+                attackDamage = saveDamage;
             }
         }
     }

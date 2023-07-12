@@ -7,16 +7,36 @@ public class DroneEnemy : Creature
 {
     [SerializeField] internal bool isDamaged;
     [SerializeField] internal bool bombing;
-    [SerializeField] internal float damage;
-    [SerializeField] internal float saveDamage;
     [SerializeField] bool inside;
     [SerializeField] bool isDoing;
+    [SerializeField] GameObject shield;
     void Awake()
     {
+        shield = GameObject.Find("Shield");
         anim = GetComponent<Animator>();
-        saveDamage = damage;
     }
-    IEnumerator OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerWeapon") && other.name.Contains("Z"))
+        {
+            hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
+            Damaged();
+        }
+        if (other.CompareTag("Player"))
+        {
+            if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
+            {
+                attackDamage = saveDamage;
+                attackDamage -= attackDamage - PlayerController.instance.reduce > 0 ? PlayerController.instance.reduce : attackDamage;
+            }
+            else if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
+            {
+                attackDamage = saveDamage;
+            }
+        }
+        Debug.Log(other.tag);
+    }
+    IEnumerator OntriggerStay(Collider2D other)
     {
         if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
@@ -36,7 +56,11 @@ public class DroneEnemy : Creature
                 StartCoroutine(SuicideBombing());
             }
         }
-        Debug.Log(other.tag);
+    }
+    void Damaged()
+    {
+        anim.SetTrigger("isDamaged");
+        isDamaged = false;
     }
     void OnTriggerExit2D(Collider2D other)
     {
@@ -54,7 +78,7 @@ public class DroneEnemy : Creature
         yield return new WaitForSeconds(time);
         int layerNumber = LayerMask.NameToLayer("EnemyWeapon");
         gameObject.layer = layerNumber;
-        damage = saveDamage;
+        attackDamage = saveDamage;
         bombing = true;
         anim.SetTrigger("bomb");
         yield return new WaitForSeconds(delayTime);

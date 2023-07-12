@@ -44,10 +44,6 @@ public class RifleEnemy : Creature
             LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
         }
-        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
-        {
-            PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
-        }
     }
     IEnumerator OnTriggerStay2D(Collider2D other)
     {
@@ -68,13 +64,13 @@ public class RifleEnemy : Creature
             StartCoroutine(Attack(other));
         }
     }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
-        {
-            PlayerController.instance.reduceDamage = 0;
-        }
-    }
+    // void OnTriggerExit2D(Collider2D other)
+    // {
+    //     if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
+    //     {
+    //         PlayerController.instance.reduceDamage = 0;
+    //     }
+    // }
     void Damaged()
     {
         anim.SetTrigger("isDamaged");
@@ -84,12 +80,10 @@ public class RifleEnemy : Creature
     IEnumerator Attack(Collider2D other)
     {
         isDoing = false;
-        int o = 0;
-        Debug.Log(o++);
         while (!isAttack && Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range)
         {
             isAttack = true;
-            Debug.Log(isAttack);
+            // Debug.Log(isAttack);
             yield return new WaitUntil(() => !GameManager.instance.pause);
             float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
             transform.localScale = new Vector2(LR, 1f);

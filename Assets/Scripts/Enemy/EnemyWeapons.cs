@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class EnemyWeapons : MonoBehaviour
 {
-    RestEnemy restEnemy;
+    SwordEnemy swordEnemy;
     void Start()
     {
-        restEnemy = GetComponent<RestEnemy>();
+        swordEnemy = GetComponent<SwordEnemy>();
     }
     void OnTriggerEnter2D(Collider2D other)
     {

@@ -8,11 +8,7 @@ public class PlayerShield : PlayerWeapons
     {
         if (other.CompareTag("EnemyWeapon") && PlayerController.instance.weaponNames[0] == "Shield")
         {
-            if (other.name.Contains("Arrow"))
-            {
-                Destroy(other.gameObject);
-            }
-            else if (other.name.Contains("shield") && other.gameObject.GetComponentInParent<ShieldEnemy>().holding)
+            if (other.name.Contains("shield") && other.gameObject.GetComponentInParent<ShieldEnemy>().holding)
             {
                 other.gameObject.SetActive(false);
             }

@@ -18,11 +18,12 @@ public class ShieldEnemy : Creature
     [SerializeField] internal bool isDamaged;
     [SerializeField] internal bool isDoing;
     [SerializeField] internal int LR;
-
+    [SerializeField] GameObject shield;
     Rigidbody2D EnemyRB;
     Canvas canvas;
     void Start()
     {
+        shield = GameObject.Find("Shield");
         // speed = 5.0f;
         range = 3.0f;
         // time = 1.0f;
@@ -73,11 +74,17 @@ public class ShieldEnemy : Creature
         }
         if (other.CompareTag("Player"))
         {
-            if (other.transform.Find("Shield").gameObject.activeSelf)
+            attackDamage = damage;
+            if (other.CompareTag("Player"))
             {
-                if (Mathf.Abs(transform.position.x - other.transform.position.x) > Mathf.Abs(transform.position.x - other.transform.Find("Shield").position.x) ? true : false)
+                if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
                 {
-                    PlayerController.instance.Reduce();
+                    attackDamage = saveDamage;
+                    attackDamage -= attackDamage - PlayerController.instance.reduce > 0 ? PlayerController.instance.reduce : attackDamage;
+                }
+                else if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
+                {
+                    attackDamage = saveDamage;
                 }
             }
         }
@@ -90,16 +97,13 @@ public class ShieldEnemy : Creature
             // 공격범위에 들어옴;
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
             {
+                anim.SetBool("isAttack", false);
+                anim.SetBool("isWalk", true);
+                float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
+                transform.localScale = new Vector2(LR, 1f);
                 transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
             }
             StartCoroutine(Attack(other));
-        }
-    }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
-        {
-            PlayerController.instance.reduceDamage = 0;
         }
     }
     void Update()
@@ -128,10 +132,11 @@ public class ShieldEnemy : Creature
                 if (!holding)
                 {
                     isAttack = true;
-                    anim.SetBool("isCrush", true);
                     anim.CrossFade("Shield_Crush", 0f);
+                    anim.SetBool("isAttack", true);
                     isDefending = true;
                     holding = true;
+                    anim.SetBool("isWalk", false);
                     float pl = (transform.position.x > other.transform.position.x) ? -action : action;
                     yield return new WaitForSeconds(time);
                     damageOn = true;
@@ -148,7 +153,7 @@ public class ShieldEnemy : Creature
                     yield return new WaitForSeconds(delayTime);
                     LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
                     transform.localScale = new Vector3(LR, 1);
-                    anim.SetBool("isCrush", false);
+                    anim.SetBool("isAttack", false);
                 }
                 isAttack = false;
             }

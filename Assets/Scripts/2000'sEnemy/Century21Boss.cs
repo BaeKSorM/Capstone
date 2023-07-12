@@ -57,10 +57,6 @@ public class Century21Boss : MonoBehaviour
         {
             hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
         }
-        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
-        {
-            PlayerController.instance.Reduce();
-        }
     }
     IEnumerator UseSkills()
     {

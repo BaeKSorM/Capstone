@@ -5,6 +5,9 @@ using UnityEngine;
 public class AIM120B : MonoBehaviour
 {
     [SerializeField] internal float damage;
+    [SerializeField] internal float launchSpeed;
+    [SerializeField] internal float flySpeed;
+    [SerializeField] internal float rotSpeed;
     [SerializeField] internal GameObject p;
     [SerializeField] internal Transform targetPos;
     [SerializeField] internal float rise;
@@ -39,7 +42,7 @@ public class AIM120B : MonoBehaviour
         Vector3 risePos = transform.position + new Vector3(0, rise, 0);
         while (transform.position != risePos)
         {
-            transform.position = Vector3.MoveTowards(transform.position, risePos, 0.01f);
+            transform.position = Vector3.MoveTowards(transform.position, risePos, launchSpeed * Time.deltaTime);
             yield return null;
         }
         StartCoroutine(Launch());
@@ -61,7 +64,7 @@ public class AIM120B : MonoBehaviour
         {
             do
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, q, 0.01f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, q, rotSpeed * Time.deltaTime);
                 yield return null;
             } while (transform.rotation != q);
         }
@@ -69,14 +72,14 @@ public class AIM120B : MonoBehaviour
         {
             do
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, q, 0.01f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, q, rotSpeed * Time.deltaTime);
                 yield return null;
             } while (transform.rotation != q2);
         }
         Vector2 forward = transform.up;
         while (gameObject != null || !bombing)
         {
-            transform.position += (Vector3)forward * Time.deltaTime;
+            transform.position += (Vector3)forward * flySpeed * Time.deltaTime;
             yield return null;
         }
     }

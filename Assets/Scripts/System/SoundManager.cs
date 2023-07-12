@@ -15,22 +15,28 @@ public class SoundManager : MonoBehaviour
     {
         instance = this;
     }
+    void Start()
+    {
+        volume.value = PlayerPrefs.GetFloat("Volume");
+        music.value = PlayerPrefs.GetFloat("Music");
+        soundEffect.value = PlayerPrefs.GetFloat("SFX");
+    }
     public void SetVolme()
     {
-        audioMixer.SetFloat("Volume", volume.value - 80);
+        audioMixer.SetFloat("Volume", volume.value);
     }
     public void SetMusicVolme()
     {
-        PlayerPrefs.SetFloat("Music", music.value - 80);
+        audioMixer.SetFloat("Music", music.value);
     }
     public void SetSoundEffectVolme()
     {
-        PlayerPrefs.SetFloat("SFX", soundEffect.value - 80);
+        audioMixer.SetFloat("SoundEffect", soundEffect.value);
     }
     public void VolumeSave()
     {
-        PlayerPrefs.SetFloat("Volume", volume.value - 80);
-        audioMixer.SetFloat("Music", music.value - 80);
-        audioMixer.SetFloat("SoundEffect", soundEffect.value - 80);
+        PlayerPrefs.SetFloat("Volume", volume.value);
+        PlayerPrefs.SetFloat("Music", music.value);
+        PlayerPrefs.SetFloat("SFX", soundEffect.value);
     }
 }

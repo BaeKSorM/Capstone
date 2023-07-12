@@ -51,10 +51,6 @@ public class CrossbowEnemy : Creature
             LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
             Damaged();
         }
-        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
-        {
-            PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
-        }
     }
     IEnumerator OnTriggerStay2D(Collider2D other)
     {
@@ -68,23 +64,17 @@ public class CrossbowEnemy : Creature
                 float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
                 transform.localScale = new Vector2(LR, 1f);
                 anim.SetBool("isAttack", false);
+                anim.SetBool("isWalk", true);
                 transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
                 yield return null;
             }
             StartCoroutine(Attack(other));
         }
     }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
-        {
-            PlayerController.instance.reduceDamage = 0;
-        }
-    }
     void Damaged()
     {
         anim.SetTrigger("isDamaged");
-        EnemyRB.AddForce(new Vector2(LR * 4, 0), ForceMode2D.Impulse);
+        EnemyRB.AddForce(new Vector2(LR * 2, 0), ForceMode2D.Impulse);
         isDamaged = false;
     }
     IEnumerator Attack(Collider2D other)
@@ -92,14 +82,16 @@ public class CrossbowEnemy : Creature
         isDoing = false;
         while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= range && !isAttack && !isWall)
         {
-            Debug.Log(isAttack);
+            // Debug.Log(isAttack);
             yield return new WaitUntil(() => !GameManager.instance.pause);
             float LR = ((other.transform.position.x > transform.position.x) ? -1f : 1f);
             // 화살 쏘는 애는 너무 플레이어와 너무 가까우면 거리두기기
             if (Mathf.Abs(transform.position.x - other.transform.parent.position.x) <= dangerRange && !isAvoiding && !isWall)
             {
                 yield return new WaitUntil(() => !GameManager.instance.pause);
-                anim.CrossFade("Crossbow_Run", 0f);
+                // anim.CrossFade("Crossbow_Run", 0f);
+                anim.SetBool("isWalk", true);
+                anim.SetBool("isAttack", false);
                 transform.localScale = new Vector2(-LR, 1f);
                 isAvoiding = true;
                 float pl = (transform.position.x > other.transform.position.x) ? action : -action;
@@ -160,13 +152,15 @@ public class CrossbowEnemy : Creature
     }
     IEnumerator oppositeTheWall()
     {
-        anim.CrossFade("Crossbow_Run", 0f);
+        // anim.CrossFade("Crossbow_Run", 0f);
+        anim.SetBool("isWalk", true);
+        anim.SetBool("isAttack", false);
         transform.localScale = new Vector2(-LR, 1);
         float arrivePos = transform.position.x + transform.localScale.x * -action;
         while (Mathf.Abs(transform.position.x - arrivePos) > 0.1f)
         {
-            transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos, transform.position.y), avoidSpeed * Time.deltaTime);
-            yield return new WaitForSeconds(0.001f);
+            transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos, transform.position.y), speed * Time.deltaTime);
+            yield return null;
         }
         isWall = false;
         isAvoiding = false;
@@ -178,7 +172,8 @@ public class CrossbowEnemy : Creature
     IEnumerator Avoidance(Vector2 arrivePos, Collider2D other)
     {
         anim.SetBool("isAttack", false);
-        anim.CrossFade("Crossbow_Run", 0f);
+        anim.SetBool("isWalk", true);
+        // anim.CrossFade("Crossbow_Run", 0f);
         // Debug.Log("Avoidance");
         LR = other.transform.position.x > transform.position.x ? 1 : -1;
 
@@ -186,8 +181,8 @@ public class CrossbowEnemy : Creature
         transform.localScale = new Vector2(LR, 1f);
         while (Mathf.Abs(transform.position.x - arrivePos.x) > 0.1f && !isWall)
         {
-            transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos.x, transform.position.y), avoidSpeed * Time.deltaTime);
-            yield return new WaitForSeconds(0.001f);
+            transform.position = Vector2.MoveTowards(transform.position, new Vector2(arrivePos.x, transform.position.y), speed * Time.deltaTime);
+            yield return null;
         }
         transform.localScale = new Vector2(-LR, 1f);
         yield return new WaitForSeconds(avoidingTime);

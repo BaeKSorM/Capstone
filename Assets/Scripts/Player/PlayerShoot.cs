@@ -36,6 +36,7 @@ public class PlayerShoot : PlayerWeapons
         projectileClone = Instantiate(projectile, shootPos.position, Quaternion.Euler(new Vector3(0, 0, fireAngle * transform.parent.localScale.x)));
         projectileClone.GetComponent<PlayerProjectile>().damage = damage;
         projectileClone.GetComponent<Rigidbody2D>().velocity = projectileClone.transform.right * firePower * transform.parent.localScale.x;
+        projectileClone.transform.parent = shootPos;
     }
     IEnumerator Rifle()
     {
@@ -44,10 +45,5 @@ public class PlayerShoot : PlayerWeapons
         projectileClone = Instantiate(projectile, shootPos);
         yield return new WaitForSeconds(0.1f);
         projectileClone = Instantiate(projectile, shootPos);
-    }
-    IEnumerator LaserBeam()
-    {
-
-        yield return null;
     }
 }

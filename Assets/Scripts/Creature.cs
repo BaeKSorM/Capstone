@@ -17,6 +17,9 @@ public class Creature : MonoBehaviour
     [SerializeField] internal float action;
     [Tooltip("공격 데미지")]
     [SerializeField] internal float attackDamage;
+    [Tooltip("저장 공격 데미지")]
+    [SerializeField] internal float saveDamage;
+    public float damage;
     [Tooltip("공격 하는 중인지")]
     [SerializeField] internal bool isAttack;
     [SerializeField] internal Animator anim;

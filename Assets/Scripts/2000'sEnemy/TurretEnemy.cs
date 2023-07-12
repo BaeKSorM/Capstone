@@ -41,10 +41,6 @@ public class TurretEnemy : Creature
             hpbar.value -= other.GetComponent<PlayerWeapons>().damage;
             Damaged();
         }
-        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
-        {
-            PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
-        }
     }
     void OnTriggerStay2D(Collider2D other)
     {
@@ -58,13 +54,6 @@ public class TurretEnemy : Creature
             {
                 StartCoroutine(Attack(other));
             }
-        }
-    }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
-        {
-            PlayerController.instance.reduceDamage = 0;
         }
     }
     void Damaged()

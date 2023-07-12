@@ -62,39 +62,38 @@ public class ArmyShieldEnemy : Creature
                 Debug.Log("shie");
             }
         }
-        if (other.CompareTag("PlayerWeapon") && other.name == "Shield")
-        {
-            PlayerController.instance.reduceDamage = PlayerController.instance.reduce;
-        }
     }
-    void OnTriggerStay2D(Collider2D other)
+    IEnumerator OnTriggerStay2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("AttackSight") && !isDamaged && !GameManager.instance.pause && !isDoing)
         {
             isDoing = true;
             // 공격범위에 들어옴;
-            while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack)
+            while (Mathf.Abs(transform.position.x - other.transform.parent.position.x) > range && !isAttack && isDoing)
             {
                 LR = transform.position.x > other.transform.parent.position.x ? 1 : -1;
                 transform.localScale = new Vector2(LR, 1);
                 anim.SetBool("isWalk", true);
+                anim.SetBool("isAttack", false);
                 transform.position = Vector2.MoveTowards(transform.position, new Vector2(other.transform.position.x, transform.position.y), speed * Time.deltaTime);
+                yield return null;
             }
+            anim.SetBool("isWalk", false);
             Stop();
         }
     }
     void Stop()
     {
         isDoing = false;
-        anim.SetBool("isWalk", false);
+        anim.SetBool("isAttack", true);
     }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
-        {
-            PlayerController.instance.reduceDamage = 0;
-        }
-    }
+    // void OnTriggerExit2D(Collider2D other)
+    // {
+    //     if (other.CompareTag("PlayerWeapon") && other.name.Contains("h"))
+    //     {
+    //         PlayerController.instance.reduceDamage = 0;
+    //     }
+    // }
     void Update()
     {
         EnemyHp(enemyHpBar);

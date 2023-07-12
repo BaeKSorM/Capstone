@@ -7,38 +7,40 @@ public class EnemyProjectile : MonoBehaviour
     [SerializeField] private int rotateSpeed;
     [SerializeField] private Vector3 shootPos;
     [SerializeField] private GameObject target;
-    [SerializeField] internal float projectileDamage, damage;
+    [SerializeField] internal float projectileDamage, saveDamage;
     [Tooltip("왼쪽을 바라보면 1")]
     [SerializeField] internal float LR;
     [Tooltip("화살 사라지는 거리")]
     [SerializeField] internal float destroyRange = 5.0f;
     [SerializeField] internal Vector3 targetPos;
     [SerializeField] internal int repeat;
+    [SerializeField] GameObject shield;
     void Start()
     {
+        shield = GameObject.Find("Shield");
         if (name.Contains("Arrow"))//투사체 이름
         {
-            damage = CrossbowEnemy.Instance.attackDamage;
+            saveDamage = CrossbowEnemy.Instance.attackDamage;
         }
         else if (name.Contains("Turret"))
         {
-            damage = TurretEnemy.Instance.attackDamage;
+            saveDamage = TurretEnemy.Instance.attackDamage;
         }
         else if (name.Contains("Bullet"))
         {
-            damage = RifleEnemy.Instance.attackDamage;
+            saveDamage = RifleEnemy.Instance.attackDamage;
         }
         else if (name.Contains("Turret"))
         {
-            damage = TurretEnemy.Instance.attackDamage;
+            saveDamage = TurretEnemy.Instance.attackDamage;
         }
         if (name.Contains("Century"))
         {
-            damage = Century21Boss.instance.attackDamage;
+            saveDamage = Century21Boss.instance.attackDamage;
         }
         if (name.Contains("Rifle"))
         {
-            damage = RifleEnemy.Instance.attackDamage;
+            saveDamage = RifleEnemy.Instance.attackDamage;
         }
         StartCoroutine(Shoot());
         // shootPos =
@@ -61,12 +63,16 @@ public class EnemyProjectile : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            projectileDamage = damage;
-            if (other.transform.Find("Shield") != null && other.transform.Find("Shield").gameObject.activeSelf)
+            if (other.CompareTag("Player"))
             {
-                if (Mathf.Abs(transform.position.x - other.transform.position.x) > Mathf.Abs(transform.position.x - other.transform.Find("Shield").position.x) ? true : false)
+                if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
                 {
-                    PlayerController.instance.Reduce();
+                    projectileDamage = saveDamage;
+                    projectileDamage -= projectileDamage - PlayerController.instance.reduce > 0 ? PlayerController.instance.reduce : projectileDamage;
+                }
+                else if (Vector2.Distance(shield.transform.position, transform.position) < Vector2.Distance(other.transform.position, transform.position))
+                {
+                    projectileDamage = saveDamage;
                 }
             }
             Destroy(gameObject);
@@ -79,6 +85,6 @@ public class EnemyProjectile : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        Debug.Log(other.tag);
+        // Debug.Log(other.tag);
     }
 }
